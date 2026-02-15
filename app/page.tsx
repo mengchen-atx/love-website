@@ -11,7 +11,8 @@ import {
   MessageSquare, 
   Users,
   Camera,
-  List
+  List,
+  MapPin
 } from 'lucide-react';
 
 export default function Home() {
@@ -98,8 +99,8 @@ export default function Home() {
               />
             </div>
 
-            {/* Love Photo & Love List */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+            {/* Love Photo & Love List & Love Footprint */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
               <LoveCard
                 icon={
                   <div className="bg-red-100 p-6 rounded-2xl">
@@ -123,6 +124,16 @@ export default function Home() {
                 title="Love List"
                 description="恋爱列表 你我之间的约定"
                 href="/list"
+              />
+              <LoveCard
+                icon={
+                  <div className="bg-orange-100 p-6 rounded-2xl">
+                    <MapPin className="w-16 h-16 text-orange-500" />
+                  </div>
+                }
+                title="Love Footprint"
+                description="足迹地图 一起走过的地方"
+                href="/footprint"
               />
             </div>
           </div>
