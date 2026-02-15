@@ -12,6 +12,7 @@ import { supabase } from '@/lib/supabase';
 
 const WORLD_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 const US_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
+const CHINA_URL = '/china-provinces.json'; // 本地静态文件，不存在跨域问题
 
 type MapView = 'world' | 'china' | 'usa';
 
@@ -21,44 +22,13 @@ export default function FootprintPage() {
   const [nameMap, setNameMap] = useState<Map<string, string>>(new Map());
   const [tooltip, setTooltip] = useState('');
   const [loading, setLoading] = useState(true);
-  const [chinaGeo, setChinaGeo] = useState<any>(null);
-  const [chinaLoading, setChinaLoading] = useState(false);
-  const [chinaError, setChinaError] = useState(false);
 
   useEffect(() => { fetchFootprints(); }, []);
-
-  // 当切换到中国视图时，通过 API 代理加载中国地图数据
-  useEffect(() => {
-    if (view === 'china' && !chinaGeo && !chinaLoading) {
-      setChinaLoading(true);
-      setChinaError(false);
-      fetch('/api/china-geo')
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then(data => {
-          if (data.type === 'FeatureCollection' && data.features?.length > 0) {
-            setChinaGeo(data);
-          } else {
-            throw new Error('Invalid data format');
-          }
-          setChinaLoading(false);
-        })
-        .catch(err => {
-          console.error('加载中国地图失败:', err);
-          setChinaError(true);
-          setChinaLoading(false);
-        });
-    }
-  }, [view, chinaGeo, chinaLoading]);
 
   const fetchFootprints = async () => {
     if (!supabase) { setLoading(false); return; }
     const { data, error } = await supabase.from('footprints').select('*');
-    if (error) {
-      console.error('加载足迹数据失败:', error);
-    }
+    if (error) console.error('加载足迹数据失败:', error);
     if (data) {
       const ids = new Set<string>();
       const names = new Map<string, string>();
@@ -76,19 +46,12 @@ export default function FootprintPage() {
 
     if (visited.has(placeId)) {
       const { error } = await supabase.from('footprints').delete().eq('place_id', placeId);
-      if (error) {
-        alert('操作失败：' + error.message + '\n\n请确认已在 Supabase 中创建 footprints 表');
-        return;
-      }
+      if (error) { alert('操作失败：' + error.message + '\n\n请确认已在 Supabase 中创建 footprints 表'); return; }
       newVisited.delete(placeId);
       newNames.delete(placeId);
     } else {
-      const { error } = await supabase.from('footprints')
-        .insert([{ place_id: placeId, place_name: placeName, place_type: placeType }]);
-      if (error) {
-        alert('操作失败：' + error.message + '\n\n请确认已在 Supabase 中创建 footprints 表');
-        return;
-      }
+      const { error } = await supabase.from('footprints').insert([{ place_id: placeId, place_name: placeName, place_type: placeType }]);
+      if (error) { alert('操作失败：' + error.message + '\n\n请确认已在 Supabase 中创建 footprints 表'); return; }
       newVisited.add(placeId);
       newNames.set(placeId, placeName);
     }
@@ -106,8 +69,8 @@ export default function FootprintPage() {
     } else if (view === 'china') {
       const adcode = geo.properties?.adcode;
       const name = geo.properties?.name || '';
-      if (!adcode && !name) return;
-      togglePlace(`cn-${adcode || name}`, name, 'province');
+      if (!adcode || !name) return;
+      togglePlace(`cn-${adcode}`, name, 'province');
     } else {
       const name = geo.properties?.name || `State ${geo.id}`;
       togglePlace(`us-${geo.id}`, name, 'state');
@@ -116,7 +79,7 @@ export default function FootprintPage() {
 
   const getPlaceId = (geo: any): string => {
     if (view === 'world') return `country-${geo.id}`;
-    if (view === 'china') return `cn-${geo.properties?.adcode || geo.properties?.name}`;
+    if (view === 'china') return `cn-${geo.properties?.adcode}`;
     return `us-${geo.id}`;
   };
 
@@ -165,6 +128,21 @@ export default function FootprintPage() {
     return list.sort();
   };
 
+  // 国家列表：包含普通国家 + 如果有省/州去过则加上中国/美国
+  const getCountryList = () => {
+    const list = getVisitedList('country-');
+    if (hasAnyVisited('cn-') && !list.includes('China')) list.push('China');
+    if (hasAnyVisited('us-') && !list.includes('United States of America')) list.push('United States of America');
+    return list.sort();
+  };
+
+  const totalCountries = () => {
+    let c = countVisited('country-');
+    if (hasAnyVisited('cn-')) c++;
+    if (hasAnyVisited('us-')) c++;
+    return c;
+  };
+
   const renderGeography = (geo: any) => (
     <Geography key={geo.rsmKey} geography={geo}
       onClick={() => handleGeoClick(geo)}
@@ -200,7 +178,7 @@ export default function FootprintPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-2xl p-4 text-center shadow-md cursor-pointer hover:shadow-lg transition-all" onClick={() => setView('world')}>
-            <p className="text-3xl font-bold text-orange-600">{countVisited('country-')}</p>
+            <p className="text-3xl font-bold text-orange-600">{totalCountries()}</p>
             <p className="text-sm text-gray-500">国家</p>
           </div>
           <div className="bg-white rounded-2xl p-4 text-center shadow-md cursor-pointer hover:shadow-lg transition-all" onClick={() => setView('china')}>
@@ -231,7 +209,7 @@ export default function FootprintPage() {
           ))}
         </div>
 
-        {/* Tooltip - 固定高度容器，不会导致页面抖动 */}
+        {/* Tooltip - 固定高度，不导致页面抖动 */}
         <div className="h-10 flex items-center justify-center mb-2">
           {tooltip && (
             <span className="inline-block px-4 py-2 bg-gray-800 text-white rounded-full text-sm shadow-lg">
@@ -258,35 +236,22 @@ export default function FootprintPage() {
             </ComposableMap>
           )}
 
-          {/* 中国地图 */}
+          {/* 中国地图 - 使用本地静态文件 */}
           {view === 'china' && (
-            chinaLoading || (!chinaGeo && !chinaError) ? (
-              <div className="flex items-center justify-center py-32">
-                <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
-                <span className="ml-3 text-gray-500">加载中国地图数据...</span>
-              </div>
-            ) : chinaError ? (
-              <div className="flex flex-col items-center justify-center py-32 text-gray-500">
-                <p className="mb-4">中国地图数据加载失败</p>
-                <button onClick={() => { setChinaError(false); setChinaGeo(null); }}
-                  className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors">
-                  重试
-                </button>
-              </div>
-            ) : (
-              <ComposableMap
-                projection="geoMercator"
-                projectionConfig={{ center: [105, 35], scale: 600 }}
-                width={800} height={600}
-                style={{ width: '100%', height: 'auto' }}
-              >
-                <Geographies geography={chinaGeo}>
-                  {({ geographies }: { geographies: any[] }) =>
-                    geographies.map(renderGeography)
-                  }
-                </Geographies>
-              </ComposableMap>
-            )
+            <ComposableMap
+              projection="geoMercator"
+              projectionConfig={{ center: [105, 35], scale: 600 }}
+              width={800} height={600}
+              style={{ width: '100%', height: 'auto' }}
+            >
+              <Geographies geography={CHINA_URL}>
+                {({ geographies }: { geographies: any[] }) =>
+                  geographies
+                    .filter((geo: any) => geo.properties?.adcode && geo.properties?.name)
+                    .map(renderGeography)
+                }
+              </Geographies>
+            </ComposableMap>
           )}
 
           {/* 美国地图 */}
@@ -313,17 +278,17 @@ export default function FootprintPage() {
         </p>
 
         {/* Visited List */}
-        {visited.size > 0 && (
+        {(visited.size > 0 || hasAnyVisited('cn-') || hasAnyVisited('us-')) && (
           <div className="mt-8 bg-white rounded-2xl shadow-md p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
               <Locate className="w-5 h-5 text-pink-500" /> 已去过的地方
             </h3>
             <div className="space-y-4">
-              {countVisited('country-') > 0 && (
+              {totalCountries() > 0 && (
                 <div>
                   <p className="text-sm font-medium text-gray-500 mb-2">国家</p>
                   <div className="flex flex-wrap gap-2">
-                    {getVisitedList('country-').map(name => (
+                    {getCountryList().map(name => (
                       <span key={name} className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm">{name}</span>
                     ))}
                   </div>
