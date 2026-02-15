@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Calendar, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 interface Moment {
   id: string;
@@ -17,7 +18,8 @@ export default function MomentsPage() {
   const [moments, setMoments] = useState<Moment[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [newMoment, setNewMoment] = useState({ title: '', content: '', date: new Date().toISOString().split('T')[0], author: 'Mao' });
+  const { currentUser } = useCurrentUser();
+  const [newMoment, setNewMoment] = useState({ title: '', content: '', date: new Date().toISOString().split('T')[0] });
 
   useEffect(() => { fetchMoments(); }, []);
 
@@ -29,11 +31,12 @@ export default function MomentsPage() {
   };
 
   const handleAdd = async () => {
-    if (!newMoment.title || !newMoment.content || !supabase) return;
-    const { data } = await supabase.from('moments').insert([newMoment]).select().single();
+    if (!newMoment.title || !newMoment.content || !supabase || !currentUser) return;
+    const { data } = await supabase.from('moments')
+      .insert([{ ...newMoment, author: currentUser }]).select().single();
     if (data) {
       setMoments([data, ...moments]);
-      setNewMoment({ title: '', content: '', date: new Date().toISOString().split('T')[0], author: 'Mao' });
+      setNewMoment({ title: '', content: '', date: new Date().toISOString().split('T')[0] });
       setShowAddForm(false);
     }
   };
@@ -51,10 +54,17 @@ export default function MomentsPage() {
           <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-5 h-5" /> 返回首页
           </Link>
-          <button onClick={() => setShowAddForm(true)}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105">
-            <Plus className="w-5 h-5" /> 写新记录
-          </button>
+          <div className="flex items-center gap-3">
+            {currentUser && (
+              <span className="text-sm text-gray-600 bg-white/80 px-4 py-2 rounded-full shadow-sm">
+                当前身份：<span className="font-semibold text-pink-600">{currentUser}</span>
+              </span>
+            )}
+            <button onClick={() => setShowAddForm(true)}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <Plus className="w-5 h-5" /> 写新记录
+            </button>
+          </div>
         </div>
 
         <div className="text-center mb-12">
@@ -104,14 +114,8 @@ export default function MomentsPage() {
               <div className="space-y-4">
                 <input type="text" placeholder="标题" value={newMoment.title} onChange={(e) => setNewMoment({...newMoment, title: e.target.value})}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 bg-white" />
-                <div className="grid grid-cols-2 gap-4">
-                  <input type="date" value={newMoment.date} onChange={(e) => setNewMoment({...newMoment, date: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 bg-white" />
-                  <select value={newMoment.author} onChange={(e) => setNewMoment({...newMoment, author: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 bg-white">
-                    <option value="Mao">Mao</option><option value="Pi">Pi</option>
-                  </select>
-                </div>
+                <input type="date" value={newMoment.date} onChange={(e) => setNewMoment({...newMoment, date: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 bg-white" />
                 <textarea placeholder="记录这一刻的美好..." value={newMoment.content} onChange={(e) => setNewMoment({...newMoment, content: e.target.value})}
                   rows={6} className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none text-gray-900 bg-white" />
               </div>

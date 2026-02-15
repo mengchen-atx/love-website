@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Check, X, Heart } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 interface TodoItem {
   id: string;
@@ -17,7 +18,8 @@ export default function ListPage() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [newTodo, setNewTodo] = useState({ title: '', priority: 'medium', created_by: 'Mao' });
+  const { currentUser } = useCurrentUser();
+  const [newTodo, setNewTodo] = useState({ title: '', priority: 'medium' });
 
   useEffect(() => { fetchTodos(); }, []);
 
@@ -29,13 +31,13 @@ export default function ListPage() {
   };
 
   const handleAdd = async () => {
-    if (!newTodo.title.trim() || !supabase) return;
+    if (!newTodo.title.trim() || !supabase || !currentUser) return;
     const { data } = await supabase.from('todos')
-      .insert([{ title: newTodo.title, priority: newTodo.priority, created_by: newTodo.created_by, completed: false }])
+      .insert([{ title: newTodo.title, priority: newTodo.priority, created_by: currentUser, completed: false }])
       .select().single();
     if (data) {
       setTodos([data, ...todos]);
-      setNewTodo({ title: '', priority: 'medium', created_by: 'Mao' });
+      setNewTodo({ title: '', priority: 'medium' });
       setShowAddForm(false);
     }
   };
@@ -67,10 +69,17 @@ export default function ListPage() {
           <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-5 h-5" /> 返回首页
           </Link>
-          <button onClick={() => setShowAddForm(true)}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105">
-            <Plus className="w-5 h-5" /> 添加新约定
-          </button>
+          <div className="flex items-center gap-3">
+            {currentUser && (
+              <span className="text-sm text-gray-600 bg-white/80 px-4 py-2 rounded-full shadow-sm">
+                当前身份：<span className="font-semibold text-pink-600">{currentUser}</span>
+              </span>
+            )}
+            <button onClick={() => setShowAddForm(true)}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-500 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all duration-300 hover:scale-105">
+              <Plus className="w-5 h-5" /> 添加新约定
+            </button>
+          </div>
         </div>
 
         <div className="text-center mb-12">
@@ -133,16 +142,10 @@ export default function ListPage() {
               <div className="space-y-4">
                 <input type="text" placeholder="我们约定..." value={newTodo.title} onChange={(e) => setNewTodo({...newTodo, title: e.target.value})}
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white" />
-                <div className="grid grid-cols-2 gap-4">
-                  <select value={newTodo.priority} onChange={(e) => setNewTodo({...newTodo, priority: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white">
-                    <option value="low">不急</option><option value="medium">一般</option><option value="high">重要</option>
-                  </select>
-                  <select value={newTodo.created_by} onChange={(e) => setNewTodo({...newTodo, created_by: e.target.value})}
-                    className="px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white">
-                    <option value="Mao">Mao</option><option value="Pi">Pi</option>
-                  </select>
-                </div>
+                <select value={newTodo.priority} onChange={(e) => setNewTodo({...newTodo, priority: e.target.value})}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 text-gray-900 bg-white">
+                  <option value="low">不急</option><option value="medium">一般</option><option value="high">重要</option>
+                </select>
               </div>
               <div className="flex gap-4 mt-6">
                 <button onClick={() => setShowAddForm(false)} className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors">取消</button>

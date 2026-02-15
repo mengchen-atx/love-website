@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Send, MessageSquare, Heart } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 interface Message {
   id: string;
@@ -15,39 +16,28 @@ interface Message {
 export default function MessagesPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
-  const [currentUser, setCurrentUser] = useState('Mao');
+  const { currentUser } = useCurrentUser();
   const [loading, setLoading] = useState(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // 加载留言
-  useEffect(() => {
-    fetchMessages();
-  }, []);
+  useEffect(() => { fetchMessages(); }, []);
 
-  // 自动滚动到底部
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   const fetchMessages = async () => {
     if (!supabase) { setLoading(false); return; }
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .order('created_at', { ascending: true });
+    const { data } = await supabase
+      .from('messages').select('*').order('created_at', { ascending: true });
     if (data) setMessages(data);
     setLoading(false);
   };
 
   const handleSend = async () => {
-    if (!newMessage.trim() || !supabase) return;
-
-    const { data, error } = await supabase
-      .from('messages')
-      .insert([{ content: newMessage, author: currentUser }])
-      .select()
-      .single();
-
+    if (!newMessage.trim() || !supabase || !currentUser) return;
+    const { data } = await supabase
+      .from('messages').insert([{ content: newMessage, author: currentUser }]).select().single();
     if (data) {
       setMessages([...messages, data]);
       setNewMessage('');
@@ -67,14 +57,11 @@ export default function MessagesPage() {
           <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
             <ArrowLeft className="w-5 h-5" /> 返回首页
           </Link>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">当前身份：</span>
-            <select value={currentUser} onChange={(e) => setCurrentUser(e.target.value)}
-              className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="Mao">Mao</option>
-              <option value="Pi">Pi</option>
-            </select>
-          </div>
+          {currentUser && (
+            <span className="text-sm text-gray-600 bg-white/80 px-4 py-2 rounded-full shadow-sm">
+              当前身份：<span className="font-semibold text-pink-600">{currentUser}</span>
+            </span>
+          )}
         </div>
 
         <div className="text-center mb-8">
