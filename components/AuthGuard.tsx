@@ -42,7 +42,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
     // 监听登录状态变化
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      (event: any, session: any) => {
         if (session) {
           setAuthenticated(true);
           if (pathname === '/login') {
