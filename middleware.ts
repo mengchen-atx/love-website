@@ -78,5 +78,6 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|images).*)'],
+  // 暂时禁用 middleware，只在 API 路由生效
+  matcher: ['/api/:path*'],
 };
