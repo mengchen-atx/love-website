@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, Lock, Mail } from 'lucide-react';
+import { Heart, Lock, Mail, CheckCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
@@ -11,11 +11,13 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setSuccess(false);
 
     if (!supabase) {
       setError('Supabase 未配置，请先设置环境变量');
@@ -29,13 +31,22 @@ export default function LoginPage() {
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        throw error;
+      }
 
       if (data.user) {
-        // 登录成功，使用 window.location 强制刷新页面
-        window.location.href = '/';
+        console.log('Login successful, user:', data.user.email);
+        setSuccess(true);
+        
+        // 等待一小段时间让 cookie 设置完成
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 500);
       }
     } catch (error: any) {
+      console.error('Login failed:', error);
       setError(error.message || '登录失败，请检查邮箱和密码');
       setLoading(false);
     }
@@ -102,6 +113,14 @@ export default function LoginPage() {
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm">
                 {error}
+              </div>
+            )}
+
+            {/* 成功提示 */}
+            {success && (
+              <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2">
+                <CheckCircle className="w-4 h-4" />
+                登录成功！正在跳转...
               </div>
             )}
 
