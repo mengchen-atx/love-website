@@ -32,12 +32,11 @@ export default function LoginPage() {
       if (error) throw error;
 
       if (data.user) {
-        router.push('/');
-        router.refresh();
+        // 登录成功，使用 window.location 强制刷新页面
+        window.location.href = '/';
       }
     } catch (error: any) {
       setError(error.message || '登录失败，请检查邮箱和密码');
-    } finally {
       setLoading(false);
     }
   };
