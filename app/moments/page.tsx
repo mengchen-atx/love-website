@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Calendar, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Calendar, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 
@@ -12,6 +12,58 @@ interface Moment {
   content: string;
   date: string;
   author: string;
+}
+
+function MomentCard({ moment, onDelete }: { moment: Moment; onDelete: (id: string) => void }) {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isLong, setIsLong] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (contentRef.current) {
+      // line-height ~1.75rem (leading-relaxed), 8 lines ≈ 14rem
+      const lineHeight = parseFloat(getComputedStyle(contentRef.current).lineHeight) || 28;
+      const maxHeight = lineHeight * 8;
+      if (contentRef.current.scrollHeight > maxHeight + 4) {
+        setIsLong(true);
+      }
+    }
+  }, [moment.content]);
+
+  return (
+    <div className="relative pl-20">
+      <div className="absolute left-6 top-6 w-5 h-5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full border-4 border-white shadow-lg"></div>
+      <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">{moment.title}</h3>
+            <div className="flex items-center gap-4 text-sm text-gray-500">
+              <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{moment.date}</span>
+              <span className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 rounded-full text-xs font-medium">{moment.author}</span>
+            </div>
+          </div>
+          <button onClick={() => onDelete(moment.id)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all">
+            <Trash2 className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="relative">
+          <div ref={contentRef}
+            className={`text-gray-600 leading-relaxed whitespace-pre-wrap overflow-hidden transition-all duration-300 ${
+              isLong && !expanded ? 'max-h-[14rem]' : ''
+            }`}
+            style={isLong && !expanded ? { WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)', maskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)' } : undefined}>
+            {moment.content}
+          </div>
+          {isLong && (
+            <button onClick={() => setExpanded(!expanded)}
+              className="mt-2 inline-flex items-center gap-1 text-sm text-purple-500 hover:text-purple-700 transition-colors font-medium">
+              {expanded ? (<><ChevronUp className="w-4 h-4" />收起</>) : (<><ChevronDown className="w-4 h-4" />展开全文</>)}
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function MomentsPage() {
@@ -84,24 +136,7 @@ export default function MomentsPage() {
             <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-pink-300 via-purple-300 to-blue-300"></div>
             <div className="space-y-8">
               {moments.map((moment) => (
-                <div key={moment.id} className="relative pl-20">
-                  <div className="absolute left-6 top-6 w-5 h-5 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full border-4 border-white shadow-lg"></div>
-                  <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 group hover:-translate-y-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-2xl font-bold text-gray-800 mb-2">{moment.title}</h3>
-                        <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{moment.date}</span>
-                          <span className="px-3 py-1 bg-gradient-to-r from-pink-100 to-purple-100 text-pink-700 rounded-full text-xs font-medium">{moment.author}</span>
-                        </div>
-                      </div>
-                      <button onClick={() => handleDelete(moment.id)} className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-all">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                    <p className="text-gray-600 leading-relaxed">{moment.content}</p>
-                  </div>
-                </div>
+                <MomentCard key={moment.id} moment={moment} onDelete={handleDelete} />
               ))}
             </div>
           </div>
