@@ -8,13 +8,67 @@ import {
   Geographies,
   Geography,
 } from 'react-simple-maps';
+import { geoMercator, geoPath } from 'd3-geo';
 import { supabase } from '@/lib/supabase';
 
 const WORLD_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 const US_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
-const CHINA_URL = '/china-topo.json'; // 本地 TopoJSON 静态文件
+const CHINA_GEO_URL = '/china-geo.json';
 
 type MapView = 'world' | 'china' | 'usa';
+
+// 中国地图组件 - 使用 d3-geo 直接渲染 SVG
+function ChinaMap({ features, visited, onToggle, tooltip, onTooltip }: {
+  features: any[];
+  visited: Set<string>;
+  onToggle: (adcode: number, name: string) => void;
+  tooltip: string;
+  onTooltip: (t: string) => void;
+}) {
+  const width = 800;
+  const height = 600;
+
+  const projection = geoMercator()
+    .center([104, 35])
+    .scale(580)
+    .translate([width / 2, height / 2]);
+
+  const pathGen = geoPath().projection(projection);
+
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} style={{ width: '100%', height: 'auto', background: '#fff' }}>
+      {features.map((feat: any, i: number) => {
+        const adcode = feat.properties.adcode;
+        const name = feat.properties.name;
+        const placeId = `cn-${adcode}`;
+        const isVisited = visited.has(placeId);
+        const d = pathGen(feat);
+        if (!d) return null;
+
+        return (
+          <path
+            key={adcode || i}
+            d={d}
+            fill={isVisited ? '#ec4899' : '#e5e7eb'}
+            stroke="#fff"
+            strokeWidth={1}
+            cursor="pointer"
+            onMouseEnter={() => onTooltip(isVisited ? `${name} (已去过)` : name)}
+            onMouseLeave={() => onTooltip('')}
+            onClick={() => onToggle(adcode, name)}
+            style={{ transition: 'fill 0.2s' }}
+            onMouseOver={(e) => {
+              (e.target as SVGPathElement).style.fill = isVisited ? '#db2777' : '#d1d5db';
+            }}
+            onMouseOut={(e) => {
+              (e.target as SVGPathElement).style.fill = isVisited ? '#ec4899' : '#e5e7eb';
+            }}
+          />
+        );
+      })}
+    </svg>
+  );
+}
 
 export default function FootprintPage() {
   const [view, setView] = useState<MapView>('world');
@@ -22,6 +76,22 @@ export default function FootprintPage() {
   const [nameMap, setNameMap] = useState<Map<string, string>>(new Map());
   const [tooltip, setTooltip] = useState('');
   const [loading, setLoading] = useState(true);
+  const [chinaFeatures, setChinaFeatures] = useState<any[]>([]);
+  const [hoveredProvince, setHoveredProvince] = useState<string | null>(null);
+
+  // 预加载中国地图 GeoJSON
+  useEffect(() => {
+    fetch(CHINA_GEO_URL)
+      .then(r => r.json())
+      .then(data => {
+        const features = (data.features || []).filter(
+          (f: any) => f.properties?.adcode && f.properties?.name
+        );
+        setChinaFeatures(features);
+      })
+      .catch(err => console.error('中国地图加载失败:', err));
+  }, []);
+
   useEffect(() => { fetchFootprints(); }, []);
 
   const fetchFootprints = async () => {
@@ -235,22 +305,22 @@ export default function FootprintPage() {
             </ComposableMap>
           )}
 
-          {/* 中国地图 - 使用本地 TopoJSON */}
+          {/* 中国地图 - 使用 d3-geo 直接渲染 */}
           {view === 'china' && (
-            <ComposableMap
-              projection="geoMercator"
-              projectionConfig={{ center: [105, 35], scale: 600 }}
-              width={800} height={600}
-              style={{ width: '100%', height: 'auto' }}
-            >
-              <Geographies geography={CHINA_URL}>
-                {({ geographies }: { geographies: any[] }) =>
-                  geographies
-                    .filter((geo: any) => geo.properties?.adcode && geo.properties?.name)
-                    .map(renderGeography)
-                }
-              </Geographies>
-            </ComposableMap>
+            chinaFeatures.length > 0 ? (
+              <ChinaMap
+                features={chinaFeatures}
+                visited={visited}
+                onToggle={(adcode, name) => togglePlace(`cn-${adcode}`, name, 'province')}
+                tooltip={tooltip}
+                onTooltip={setTooltip}
+              />
+            ) : (
+              <div className="flex items-center justify-center py-32">
+                <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
+                <span className="ml-3 text-gray-500">加载中国地图...</span>
+              </div>
+            )
           )}
 
           {/* 美国地图 */}
