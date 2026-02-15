@@ -48,7 +48,7 @@ function MomentCard({ moment, onDelete }: { moment: Moment; onDelete: (id: strin
         </div>
         <div className="relative">
           <div ref={contentRef}
-            className={`text-gray-600 leading-relaxed whitespace-pre-line break-words overflow-hidden transition-all duration-300 ${
+            className={`text-gray-600 leading-relaxed break-words overflow-hidden transition-all duration-300 ${
               isLong && !expanded ? 'max-h-[14rem]' : ''
             }`}
             style={isLong && !expanded ? { WebkitMaskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)', maskImage: 'linear-gradient(to bottom, black 70%, transparent 100%)' } : undefined}>
