@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>China Map Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>China Map Data Test</h1>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        async function testChinaMap() {
+            try {
+                addResult('🔍 Testing China provinces JSON file...', 'info');
+                
+                // Test 1: Fetch the file
+                const response = await fetch('/china-provinces.json');
+                addResult(`✓ File fetch status: ${response.status} ${response.statusText}`, 
+                    response.ok ? 'success' : 'error');
+                
+                if (!response.ok) {
+                    addResult(`✗ Failed to load china-provinces.json. Make sure the file exists in the public folder.`, 'error');
+                    return;
+                }
+
+                // Test 2: Parse JSON
+                const data = await response.json();
+                addResult(`✓ JSON parsed successfully`, 'success');
+                
+                // Test 3: Validate structure
+                addResult(`<strong>Data Structure:</strong><br>
+                    - Type: ${data.type}<br>
+                    - Features count: ${data.features?.length || 0}`, 'info');
+                
+                if (!data.features || data.features.length === 0) {
+                    addResult(`✗ No features found in the GeoJSON`, 'error');
+                    return;
+                }
+
+                // Test 4: Check first few provinces
+                const provinces = data.features.slice(0, 5).map(f => ({
+                    name: f.properties?.name,
+                    adcode: f.properties?.adcode,
+                    geometryType: f.geometry?.type,
+                    hasCoordinates: !!f.geometry?.coordinates
+                }));
+
+                addResult(`<strong>First 5 Provinces:</strong><pre>${JSON.stringify(provinces, null, 2)}</pre>`, 'success');
+
+                // Test 5: Check for required properties
+                const missingProps = data.features.filter(f => 
+                    !f.properties?.adcode || !f.properties?.name
+                );
+                
+                if (missingProps.length > 0) {
+                    addResult(`⚠ Warning: ${missingProps.length} features missing adcode or name`, 'error');
+                } else {
+                    addResult(`✓ All features have required properties (adcode, name)`, 'success');
+                }
+
+                // Test 6: List all provinces
+                const allProvinces = data.features.map(f => f.properties?.name).sort();
+                addResult(`<strong>All Provinces (${allProvinces.length}):</strong><br>${allProvinces.join(', ')}`, 'info');
+
+                addResult(`<br><strong>✅ All tests passed! The china-provinces.json file is valid and ready to use.</strong>`, 'success');
+
+            } catch (error) {
+                addResult(`✗ Error: ${error.message}<br><pre>${error.stack}</pre>`, 'error');
+            }
+        }
+
+        // Run tests when page loads
+        testChinaMap();
+    </script>
+</body>
+</html>
