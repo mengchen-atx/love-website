@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, MapPin, Heart, Locate } from 'lucide-react';
+import { ArrowLeft, MapPin, Heart, Locate, Loader2 } from 'lucide-react';
 import {
   ComposableMap,
   Geographies,
@@ -22,12 +22,45 @@ export default function FootprintPage() {
   const [nameMap, setNameMap] = useState<Map<string, string>>(new Map());
   const [tooltip, setTooltip] = useState('');
   const [loading, setLoading] = useState(true);
+  const [chinaGeo, setChinaGeo] = useState<any>(null);
+  const [chinaLoading, setChinaLoading] = useState(false);
 
   useEffect(() => { fetchFootprints(); }, []);
 
+  // 当切换到中国视图时加载中国地图数据
+  useEffect(() => {
+    if (view === 'china' && !chinaGeo) {
+      setChinaLoading(true);
+      fetch(CHINA_URL)
+        .then(res => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then(data => {
+          setChinaGeo(data);
+          setChinaLoading(false);
+        })
+        .catch(err => {
+          console.error('加载中国地图失败:', err);
+          // 尝试备用地址
+          fetch('https://geojson.cn/api/data/china.json')
+            .then(res => res.json())
+            .then(data => { setChinaGeo(data); setChinaLoading(false); })
+            .catch(() => {
+              alert('加载中国地图数据失败，请刷新重试');
+              setChinaLoading(false);
+            });
+        });
+    }
+  }, [view, chinaGeo]);
+
   const fetchFootprints = async () => {
     if (!supabase) { setLoading(false); return; }
-    const { data } = await supabase.from('footprints').select('*');
+    const { data, error } = await supabase.from('footprints').select('*');
+    if (error) {
+      console.error('加载足迹数据失败:', error);
+      // 表可能不存在，静默处理
+    }
     if (data) {
       const ids = new Set<string>();
       const names = new Map<string, string>();
@@ -44,11 +77,20 @@ export default function FootprintPage() {
     const newNames = new Map(nameMap);
 
     if (visited.has(placeId)) {
-      await supabase.from('footprints').delete().eq('place_id', placeId);
+      const { error } = await supabase.from('footprints').delete().eq('place_id', placeId);
+      if (error) {
+        alert('操作失败：' + error.message + '\n\n请确认已在 Supabase 中创建 footprints 表');
+        return;
+      }
       newVisited.delete(placeId);
       newNames.delete(placeId);
     } else {
-      await supabase.from('footprints').insert([{ place_id: placeId, place_name: placeName, place_type: placeType }]);
+      const { error } = await supabase.from('footprints')
+        .insert([{ place_id: placeId, place_name: placeName, place_type: placeType }]);
+      if (error) {
+        alert('操作失败：' + error.message + '\n\n请确认已在 Supabase 中创建 footprints 表');
+        return;
+      }
       newVisited.add(placeId);
       newNames.set(placeId, placeName);
     }
@@ -66,7 +108,8 @@ export default function FootprintPage() {
     } else if (view === 'china') {
       const adcode = geo.properties?.adcode;
       const name = geo.properties?.name || '';
-      togglePlace(`cn-${adcode}`, name, 'province');
+      if (!adcode && !name) return;
+      togglePlace(`cn-${adcode || name}`, name, 'province');
     } else {
       const name = geo.properties?.name || `State ${geo.id}`;
       togglePlace(`us-${geo.id}`, name, 'state');
@@ -75,7 +118,7 @@ export default function FootprintPage() {
 
   const getPlaceId = (geo: any): string => {
     if (view === 'world') return `country-${geo.id}`;
-    if (view === 'china') return `cn-${geo.properties?.adcode}`;
+    if (view === 'china') return `cn-${geo.properties?.adcode || geo.properties?.name}`;
     return `us-${geo.id}`;
   };
 
@@ -124,7 +167,18 @@ export default function FootprintPage() {
     return list.sort();
   };
 
-  const geoUrl = view === 'world' ? WORLD_URL : view === 'china' ? CHINA_URL : US_URL;
+  const renderGeography = (geo: any) => (
+    <Geography key={geo.rsmKey} geography={geo}
+      onClick={() => handleGeoClick(geo)}
+      onMouseEnter={() => setTooltip(getTooltipText(geo))}
+      onMouseLeave={() => setTooltip('')}
+      style={{
+        default: { fill: getFill(geo), stroke: '#fff', strokeWidth: view === 'world' ? 0.5 : 1, outline: 'none' },
+        hover: { fill: getHoverFill(geo), stroke: '#fff', strokeWidth: view === 'world' ? 0.5 : 1, outline: 'none', cursor: 'pointer' },
+        pressed: { outline: 'none' },
+      }}
+    />
+  );
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
@@ -190,51 +244,52 @@ export default function FootprintPage() {
 
         {/* Map */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-          {view === 'usa' ? (
+          {/* 世界地图 */}
+          {view === 'world' && (
+            <ComposableMap
+              projection="geoMercator"
+              projectionConfig={{ center: [10, 20], scale: 147 }}
+              width={800} height={450}
+              style={{ width: '100%', height: 'auto' }}
+            >
+              <Geographies geography={WORLD_URL}>
+                {({ geographies }: { geographies: any[] }) =>
+                  geographies.map(renderGeography)
+                }
+              </Geographies>
+            </ComposableMap>
+          )}
+
+          {/* 中国地图 - 手动加载数据 */}
+          {view === 'china' && (
+            chinaLoading || !chinaGeo ? (
+              <div className="flex items-center justify-center py-32">
+                <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
+                <span className="ml-3 text-gray-500">加载中国地图数据...</span>
+              </div>
+            ) : (
+              <ComposableMap
+                projection="geoMercator"
+                projectionConfig={{ center: [105, 35], scale: 600 }}
+                width={800} height={600}
+                style={{ width: '100%', height: 'auto' }}
+              >
+                <Geographies geography={chinaGeo}>
+                  {({ geographies }: { geographies: any[] }) =>
+                    geographies.map(renderGeography)
+                  }
+                </Geographies>
+              </ComposableMap>
+            )
+          )}
+
+          {/* 美国地图 */}
+          {view === 'usa' && (
             <ComposableMap projection="geoAlbersUsa" width={800} height={500}
               style={{ width: '100%', height: 'auto' }}>
               <Geographies geography={US_URL}>
                 {({ geographies }: { geographies: any[] }) =>
-                  geographies.map((geo: any) => (
-                    <Geography key={geo.rsmKey} geography={geo}
-                      onClick={() => handleGeoClick(geo)}
-                      onMouseEnter={() => setTooltip(getTooltipText(geo))}
-                      onMouseLeave={() => setTooltip('')}
-                      style={{
-                        default: { fill: getFill(geo), stroke: '#fff', strokeWidth: 1, outline: 'none' },
-                        hover: { fill: getHoverFill(geo), stroke: '#fff', strokeWidth: 1, outline: 'none', cursor: 'pointer' },
-                        pressed: { outline: 'none' },
-                      }}
-                    />
-                  ))
-                }
-              </Geographies>
-            </ComposableMap>
-          ) : (
-            <ComposableMap
-              projection="geoMercator"
-              projectionConfig={{
-                center: (view === 'world' ? [10, 20] : [105, 35]) as [number, number],
-                scale: view === 'world' ? 147 : 600,
-              }}
-              width={800}
-              height={view === 'world' ? 450 : 600}
-              style={{ width: '100%', height: 'auto' }}
-            >
-              <Geographies geography={geoUrl}>
-                {({ geographies }: { geographies: any[] }) =>
-                  geographies.map((geo: any) => (
-                    <Geography key={geo.rsmKey} geography={geo}
-                      onClick={() => handleGeoClick(geo)}
-                      onMouseEnter={() => setTooltip(getTooltipText(geo))}
-                      onMouseLeave={() => setTooltip('')}
-                      style={{
-                        default: { fill: getFill(geo), stroke: '#fff', strokeWidth: view === 'china' ? 1 : 0.5, outline: 'none' },
-                        hover: { fill: getHoverFill(geo), stroke: '#fff', strokeWidth: view === 'china' ? 1 : 0.5, outline: 'none', cursor: 'pointer' },
-                        pressed: { outline: 'none' },
-                      }}
-                    />
-                  ))
+                  geographies.map(renderGeography)
                 }
               </Geographies>
             </ComposableMap>
