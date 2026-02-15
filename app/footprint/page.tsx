@@ -17,6 +17,19 @@ const CHINA_GEO_URL = '/china-geo.json';
 
 type MapView = 'world' | 'china' | 'usa';
 
+// 反转多边形环的坐标顺序（修复 winding order 以兼容 d3-geo）
+function fixWinding(feature: any): any {
+  const geometry = { ...feature.geometry };
+  if (geometry.type === 'MultiPolygon') {
+    geometry.coordinates = geometry.coordinates.map((polygon: any) =>
+      polygon.map((ring: any) => [...ring].reverse())
+    );
+  } else if (geometry.type === 'Polygon') {
+    geometry.coordinates = geometry.coordinates.map((ring: any) => [...ring].reverse());
+  }
+  return { ...feature, geometry };
+}
+
 // 中国地图组件 - 使用 d3-geo 直接渲染 SVG
 function ChinaMap({ features, visited, onToggle, tooltip, onTooltip }: {
   features: any[];
@@ -42,7 +55,8 @@ function ChinaMap({ features, visited, onToggle, tooltip, onTooltip }: {
         const name = feat.properties.name;
         const placeId = `cn-${adcode}`;
         const isVisited = visited.has(placeId);
-        const d = pathGen(feat);
+        const fixedFeat = fixWinding(feat);
+        const d = pathGen(fixedFeat);
         if (!d) return null;
 
         return (
