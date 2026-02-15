@@ -22,6 +22,15 @@ export default function FootprintPage() {
   const [nameMap, setNameMap] = useState<Map<string, string>>(new Map());
   const [tooltip, setTooltip] = useState('');
   const [loading, setLoading] = useState(true);
+  const [chinaGeo, setChinaGeo] = useState<any>(null);
+
+  // 预加载中国地图数据
+  useEffect(() => {
+    fetch(CHINA_URL)
+      .then(res => res.json())
+      .then(data => setChinaGeo(data))
+      .catch(err => console.error('中国地图加载失败:', err));
+  }, []);
 
   useEffect(() => { fetchFootprints(); }, []);
 
@@ -236,22 +245,29 @@ export default function FootprintPage() {
             </ComposableMap>
           )}
 
-          {/* 中国地图 - 使用本地静态文件 */}
+          {/* 中国地图 - 使用预加载的数据对象 */}
           {view === 'china' && (
-            <ComposableMap
-              projection="geoMercator"
-              projectionConfig={{ center: [105, 35], scale: 600 }}
-              width={800} height={600}
-              style={{ width: '100%', height: 'auto' }}
-            >
-              <Geographies geography={CHINA_URL}>
-                {({ geographies }: { geographies: any[] }) =>
-                  geographies
-                    .filter((geo: any) => geo.properties?.adcode && geo.properties?.name)
-                    .map(renderGeography)
-                }
-              </Geographies>
-            </ComposableMap>
+            chinaGeo ? (
+              <ComposableMap
+                projection="geoMercator"
+                projectionConfig={{ center: [105, 35], scale: 600 }}
+                width={800} height={600}
+                style={{ width: '100%', height: 'auto' }}
+              >
+                <Geographies geography={chinaGeo}>
+                  {({ geographies }: { geographies: any[] }) =>
+                    geographies
+                      .filter((geo: any) => geo.properties?.adcode && geo.properties?.name)
+                      .map(renderGeography)
+                  }
+                </Geographies>
+              </ComposableMap>
+            ) : (
+              <div className="flex items-center justify-center py-32">
+                <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
+                <span className="ml-3 text-gray-500">加载中国地图...</span>
+              </div>
+            )
           )}
 
           {/* 美国地图 */}
