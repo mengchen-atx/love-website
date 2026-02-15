@@ -120,14 +120,17 @@ export default function AboutPage() {
               <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-300 via-purple-300 to-blue-300 hidden md:block"></div>
 
               <div className="space-y-12">
-                {milestones.map((milestone, index) => (
+                {milestones.map((milestone, index) => {
+                  const isLeft = index % 2 === 0; // 左侧显示（内容右对齐靠近轴）
+                  return (
                   <div key={milestone.id}
-                    className={`relative flex items-center ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} flex-col gap-8`}>
+                    className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-col gap-8`}>
                     
-                    <div className="flex-1 md:text-right text-center">
+                    {/* 内容区域 */}
+                    <div className={`flex-1 ${isLeft ? 'md:flex md:justify-end' : 'md:flex md:justify-start'} flex justify-center`}>
                       {editingId === milestone.id ? (
                         /* 编辑模式 */
-                        <div className="bg-white rounded-2xl p-6 shadow-lg space-y-3">
+                        <div className="bg-white rounded-2xl p-6 shadow-lg space-y-3 w-full max-w-sm">
                           <input type="date" value={editForm.date} onChange={(e) => setEditForm({...editForm, date: e.target.value})}
                             className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-purple-500" />
                           <input type="text" value={editForm.title} onChange={(e) => setEditForm({...editForm, title: e.target.value})} placeholder="标题"
@@ -141,13 +144,13 @@ export default function AboutPage() {
                         </div>
                       ) : (
                         /* 显示模式 */
-                        <div className={`inline-block ${index % 2 === 0 ? 'md:text-right' : 'md:text-left'} text-center group relative`}>
+                        <div className={`${isLeft ? 'md:text-right' : 'md:text-left'} text-center group relative`}>
                           <p className="text-sm text-gray-500 mb-2">{milestone.date}</p>
                           <h3 className="text-2xl font-bold text-gray-800 mb-2">{milestone.title}</h3>
                           <p className="text-gray-600">{milestone.description}</p>
                           <p className="text-xs text-gray-400 mt-2">by {milestone.author}</p>
                           {/* 操作按钮 */}
-                          <div className="opacity-0 group-hover:opacity-100 transition-all flex gap-2 justify-center mt-3">
+                          <div className={`opacity-0 group-hover:opacity-100 transition-all flex gap-2 ${isLeft ? 'md:justify-end' : 'md:justify-start'} justify-center mt-3`}>
                             <button onClick={() => startEdit(milestone)} className="p-2 bg-white rounded-full shadow-md text-blue-500 hover:text-blue-700 transition-colors">
                               <Edit3 className="w-4 h-4" />
                             </button>
@@ -160,15 +163,17 @@ export default function AboutPage() {
                     </div>
 
                     {/* 中间图标 */}
-                    <div className="relative z-10">
+                    <div className="relative z-10 flex-shrink-0">
                       <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-purple-500 rounded-full flex items-center justify-center shadow-lg">
                         <Heart className="w-8 h-8 text-white" />
                       </div>
                     </div>
 
+                    {/* 占位区域 */}
                     <div className="flex-1 hidden md:block"></div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
