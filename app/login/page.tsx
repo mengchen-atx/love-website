@@ -37,13 +37,9 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        console.log('Login successful, user:', data.user.email);
         setSuccess(true);
-        
-        // 等待一小段时间让 cookie 设置完成
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 500);
+        // AuthGuard 会自动检测到登录状态并跳转
+        router.push('/');
       }
     } catch (error: any) {
       console.error('Login failed:', error);
