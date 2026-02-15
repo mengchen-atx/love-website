@@ -12,7 +12,6 @@ import { supabase } from '@/lib/supabase';
 
 const WORLD_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 const US_URL = 'https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json';
-const CHINA_URL = 'https://geo.datav.aliyun.com/areas_v3/bound/100000_full.json';
 
 type MapView = 'world' | 'china' | 'usa';
 
@@ -24,42 +23,41 @@ export default function FootprintPage() {
   const [loading, setLoading] = useState(true);
   const [chinaGeo, setChinaGeo] = useState<any>(null);
   const [chinaLoading, setChinaLoading] = useState(false);
+  const [chinaError, setChinaError] = useState(false);
 
   useEffect(() => { fetchFootprints(); }, []);
 
-  // 当切换到中国视图时加载中国地图数据
+  // 当切换到中国视图时，通过 API 代理加载中国地图数据
   useEffect(() => {
-    if (view === 'china' && !chinaGeo) {
+    if (view === 'china' && !chinaGeo && !chinaLoading) {
       setChinaLoading(true);
-      fetch(CHINA_URL)
+      setChinaError(false);
+      fetch('/api/china-geo')
         .then(res => {
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           return res.json();
         })
         .then(data => {
-          setChinaGeo(data);
+          if (data.type === 'FeatureCollection' && data.features?.length > 0) {
+            setChinaGeo(data);
+          } else {
+            throw new Error('Invalid data format');
+          }
           setChinaLoading(false);
         })
         .catch(err => {
           console.error('加载中国地图失败:', err);
-          // 尝试备用地址
-          fetch('https://geojson.cn/api/data/china.json')
-            .then(res => res.json())
-            .then(data => { setChinaGeo(data); setChinaLoading(false); })
-            .catch(() => {
-              alert('加载中国地图数据失败，请刷新重试');
-              setChinaLoading(false);
-            });
+          setChinaError(true);
+          setChinaLoading(false);
         });
     }
-  }, [view, chinaGeo]);
+  }, [view, chinaGeo, chinaLoading]);
 
   const fetchFootprints = async () => {
     if (!supabase) { setLoading(false); return; }
     const { data, error } = await supabase.from('footprints').select('*');
     if (error) {
       console.error('加载足迹数据失败:', error);
-      // 表可能不存在，静默处理
     }
     if (data) {
       const ids = new Set<string>();
@@ -233,14 +231,14 @@ export default function FootprintPage() {
           ))}
         </div>
 
-        {/* Tooltip */}
-        {tooltip && (
-          <div className="text-center mb-2">
+        {/* Tooltip - 固定高度容器，不会导致页面抖动 */}
+        <div className="h-10 flex items-center justify-center mb-2">
+          {tooltip && (
             <span className="inline-block px-4 py-2 bg-gray-800 text-white rounded-full text-sm shadow-lg">
               {tooltip}
             </span>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Map */}
         <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
@@ -260,12 +258,20 @@ export default function FootprintPage() {
             </ComposableMap>
           )}
 
-          {/* 中国地图 - 手动加载数据 */}
+          {/* 中国地图 */}
           {view === 'china' && (
-            chinaLoading || !chinaGeo ? (
+            chinaLoading || (!chinaGeo && !chinaError) ? (
               <div className="flex items-center justify-center py-32">
                 <Loader2 className="w-10 h-10 text-pink-500 animate-spin" />
                 <span className="ml-3 text-gray-500">加载中国地图数据...</span>
+              </div>
+            ) : chinaError ? (
+              <div className="flex flex-col items-center justify-center py-32 text-gray-500">
+                <p className="mb-4">中国地图数据加载失败</p>
+                <button onClick={() => { setChinaError(false); setChinaGeo(null); }}
+                  className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition-colors">
+                  重试
+                </button>
               </div>
             ) : (
               <ComposableMap
