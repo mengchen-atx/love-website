@@ -10,9 +10,16 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// 创建 Supabase 客户端（如果未配置则使用空客户端）
+// 创建 Supabase 客户端
+// 使用 sessionStorage：关闭浏览器后需要重新登录
 export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        storageKey: 'supabase-auth',
+        storage: typeof window !== 'undefined' ? window.sessionStorage : undefined,
+      }
+    })
   : null as any;
 
 // 数据库类型定义（待完善）
