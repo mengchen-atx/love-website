@@ -29,8 +29,10 @@ export default function MessagesPage() {
   const fetchMessages = async () => {
     if (!supabase) { setLoading(false); return; }
     const { data } = await supabase
-      .from('messages').select('*').order('created_at', { ascending: true });
-    if (data) setMessages(data);
+      .from('messages').select('*')
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (data) setMessages(data.reverse());
     setLoading(false);
   };
 

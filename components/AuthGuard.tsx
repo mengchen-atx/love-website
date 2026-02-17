@@ -28,14 +28,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         setAuthenticated(true);
         setUserEmail(session.user?.email ?? null);
         // 如果在登录页但已登录，跳转到首页
-        if (pathname === '/login') {
+        if (window.location.pathname === '/login') {
           router.push('/');
         }
       } else {
         setAuthenticated(false);
         setUserEmail(null);
         // 如果不在登录页且未登录，跳转到登录页
-        if (pathname !== '/login') {
+        if (window.location.pathname !== '/login') {
           router.push('/login');
         }
       }
@@ -50,13 +50,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         if (session) {
           setAuthenticated(true);
           setUserEmail(session.user?.email ?? null);
-          if (pathname === '/login') {
+          if (window.location.pathname === '/login') {
             router.push('/');
           }
         } else {
           setAuthenticated(false);
           setUserEmail(null);
-          if (pathname !== '/login') {
+          if (window.location.pathname !== '/login') {
             router.push('/login');
           }
         }
@@ -64,7 +64,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     );
 
     return () => subscription.unsubscribe();
-  }, [pathname, router]);
+  }, []);
 
   // 加载中显示 loading
   if (loading) {
