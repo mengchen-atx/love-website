@@ -4,12 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Heart } from 'lucide-react';
+import { AuthContext } from './AuthContext';
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
     // 如果 Supabase 未配置，直接放行
@@ -24,12 +26,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
       if (session) {
         setAuthenticated(true);
+        setUserEmail(session.user?.email ?? null);
         // 如果在登录页但已登录，跳转到首页
         if (pathname === '/login') {
           router.push('/');
         }
       } else {
         setAuthenticated(false);
+        setUserEmail(null);
         // 如果不在登录页且未登录，跳转到登录页
         if (pathname !== '/login') {
           router.push('/login');
@@ -45,11 +49,13 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       (event: any, session: any) => {
         if (session) {
           setAuthenticated(true);
+          setUserEmail(session.user?.email ?? null);
           if (pathname === '/login') {
             router.push('/');
           }
         } else {
           setAuthenticated(false);
+          setUserEmail(null);
           if (pathname !== '/login') {
             router.push('/login');
           }
@@ -82,5 +88,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <AuthContext.Provider value={{ userEmail }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
