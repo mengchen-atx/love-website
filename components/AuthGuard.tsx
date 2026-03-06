@@ -25,7 +25,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       }
       loginRedirectTimer = setTimeout(() => {
         router.push('/');
-      }, 1000);
+      }, 1500);
     };
 
     // 如果 Supabase 未配置，直接放行
@@ -41,7 +41,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       if (session) {
         setAuthenticated(true);
         setUserEmail(session.user?.email ?? null);
-        // 在登录页登录成功后，留1秒给庆祝动画播放
+        // 在登录页登录成功后，留1.5秒给庆祝动画播放
         redirectFromLoginWithDelay();
       } else {
         setAuthenticated(false);
@@ -62,7 +62,7 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         if (session) {
           setAuthenticated(true);
           setUserEmail(session.user?.email ?? null);
-          // 在登录页登录成功后，留1秒给庆祝动画播放
+          // 在登录页登录成功后，留1.5秒给庆祝动画播放
           redirectFromLoginWithDelay();
         } else {
           setAuthenticated(false);
