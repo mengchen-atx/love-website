@@ -148,22 +148,24 @@ export default function LoginPage() {
 
   return (
     <main
-      className="h-dvh overflow-hidden bg-white"
+      className="h-dvh w-full overflow-x-hidden overflow-y-hidden bg-white"
       onMouseMove={(event) => {
         const rect = leftPanelRef.current?.getBoundingClientRect();
         if (!rect) {
           return;
         }
-        const x = ((event.clientX - rect.left) / rect.width) * 100;
-        const y = ((event.clientY - rect.top) / rect.height) * 100;
+        const rawX = ((event.clientX - rect.left) / rect.width) * 100;
+        const rawY = ((event.clientY - rect.top) / rect.height) * 100;
+        const x = Math.max(0, Math.min(100, rawX));
+        const y = Math.max(0, Math.min(100, rawY));
         setMouse({ x, y, active: true });
       }}
       onMouseLeave={() => setMouse((prev) => ({ ...prev, active: false }))}
     >
-      <div className="grid h-full grid-cols-1 md:grid-cols-2">
+      <div className="grid h-full w-full grid-cols-1 md:grid-cols-2">
         <section
           ref={leftPanelRef}
-          className="relative h-full overflow-hidden bg-gradient-to-br from-slate-600 via-slate-500 to-slate-400 p-6 text-white md:p-8"
+          className="relative h-full min-w-0 overflow-hidden bg-gradient-to-br from-slate-600 via-slate-500 to-slate-400 p-6 text-white md:p-8"
         >
           <div className="flex h-full min-h-0 flex-col">
             <div className="flex items-center gap-2">
@@ -360,22 +362,22 @@ export default function LoginPage() {
           </div>
         </section>
 
-        <section className="relative flex h-full items-center justify-center overflow-hidden bg-white px-6 py-4 md:px-10 md:py-5">
+        <section className="relative flex h-full min-w-0 items-center justify-center overflow-hidden bg-white px-5 py-3 md:px-8 md:py-4">
           <div className="pointer-events-none absolute right-10 top-10 h-28 w-28 rounded-full bg-pink-200/50 blur-2xl" />
           <div className="pointer-events-none absolute bottom-14 left-8 h-32 w-32 rounded-full bg-violet-200/45 blur-2xl" />
 
-          <div className="relative w-full max-w-md">
-            <div className="mb-4 rounded-3xl border border-pink-100 bg-gradient-to-r from-pink-50 via-rose-50 to-violet-50 p-4">
+          <div className="relative w-full max-w-[28rem]">
+            <div className="mb-3 rounded-3xl border border-pink-100 bg-gradient-to-r from-pink-50 via-rose-50 to-violet-50 p-3.5">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-pink-600">
+                  <p className="inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-medium text-pink-600">
                     <Sparkles className="h-3.5 w-3.5" />
                     Couple Space
                   </p>
-                  <h1 className="mt-2 text-[30px] font-semibold tracking-tight text-gray-900">
+                  <h1 className="mt-2 text-[24px] font-semibold tracking-tight text-gray-900 md:text-[26px]">
                     Welcome back, love
                   </h1>
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-1 text-xs text-gray-600 md:text-sm">
                     记录你们每一个心动瞬间
                   </p>
                 </div>
@@ -387,7 +389,7 @@ export default function LoginPage() {
                   <Heart className="h-5 w-5 fill-current" />
                 </motion.div>
               </div>
-              <div className="mt-4 flex items-center gap-2 text-xs text-gray-500">
+              <div className="mt-3 flex items-center gap-2 text-[11px] text-gray-500 md:text-xs">
                 <span className="rounded-full border border-pink-200 bg-white px-2.5 py-1">
                   Mao
                 </span>
@@ -398,7 +400,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-gray-100 bg-white/95 p-5 shadow-[0_24px_80px_-30px_rgba(244,114,182,0.45)] backdrop-blur">
+            <div className="rounded-3xl border border-gray-100 bg-white/95 p-4 shadow-[0_24px_80px_-30px_rgba(244,114,182,0.45)] backdrop-blur md:p-5">
               <AnimatePresence>
                 {showCelebration ? (
                   <motion.div
@@ -450,11 +452,11 @@ export default function LoginPage() {
                   </motion.div>
                 ) : null}
               </AnimatePresence>
-              <p className="mb-5 text-sm text-gray-500">Please enter your details</p>
+              <p className="mb-4 text-xs text-gray-500 md:text-sm">Please enter your details</p>
 
               <form onSubmit={handleLogin} className="space-y-4">
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-1.5 block text-xs font-medium text-gray-700 md:text-sm">
                   Email
                 </label>
                 <input
@@ -466,12 +468,12 @@ export default function LoginPage() {
                   }}
                   placeholder="you@example.com"
                   required
-                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-gray-900 outline-none transition focus:border-pink-300 focus:ring-2 focus:ring-pink-200/80"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-base text-gray-900 outline-none transition focus:border-pink-300 focus:ring-2 focus:ring-pink-200/80"
                 />
               </div>
 
               <div>
-                <label className="mb-2 block text-sm font-medium text-gray-700">
+                <label className="mb-1.5 block text-xs font-medium text-gray-700 md:text-sm">
                   Password
                 </label>
                 <div className="relative">
@@ -484,7 +486,7 @@ export default function LoginPage() {
                     }}
                     placeholder="Enter your password"
                     required
-                    className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-11 text-gray-900 outline-none transition focus:border-pink-300 focus:ring-2 focus:ring-pink-200/80"
+                    className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 pr-10 text-base text-gray-900 outline-none transition focus:border-pink-300 focus:ring-2 focus:ring-pink-200/80"
                   />
                   <button
                     type="button"
@@ -501,7 +503,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center justify-between text-xs md:text-sm">
                 <label className="flex items-center gap-2 text-gray-600">
                   <input
                     type="checkbox"
@@ -532,14 +534,14 @@ export default function LoginPage() {
                   type="submit"
                   disabled={loading}
                   whileTap={{ scale: 0.982 }}
-                  className="w-full rounded-xl border border-pink-500 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 py-3 text-sm font-semibold text-white transition hover:shadow-lg hover:shadow-pink-300/40 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="w-full rounded-xl border border-pink-500 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 py-2.5 text-sm font-semibold text-white transition hover:shadow-lg hover:shadow-pink-300/40 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? 'Logging in...' : 'Log in'}
                 </motion.button>
 
                 <button
                   type="button"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
                 >
                   <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden="true">
                     <path
@@ -564,7 +566,7 @@ export default function LoginPage() {
               </form>
             </div>
 
-            <p className="mt-5 text-center text-sm text-gray-500">
+            <p className="mt-4 text-center text-xs text-gray-500 md:text-sm">
               Don't have an account?{' '}
               <a href="#" className="font-medium text-pink-600 hover:underline">
                 Sign Up
