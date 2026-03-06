@@ -110,22 +110,9 @@ export default function LoginPage() {
     setError('');
     setSuccess('');
 
-    // Mock password validation to trigger the required error animation state.
-    if (password !== 'PMLove123') {
-      setLoginStatus('error');
-      setError('Incorrect password. Try `PMLove123` for this demo.');
-      setLoading(false);
-      return;
-    }
-
-    setLoginStatus('idle');
-
     if (!supabase) {
-      setSuccess('Logged in (mock mode).');
-      setShowCelebration(true);
-      setTimeout(() => {
-        router.push('/');
-      }, 1800);
+      setLoginStatus('error');
+      setError('Supabase is not configured. Please set environment variables.');
       setLoading(false);
       return;
     }
@@ -141,6 +128,7 @@ export default function LoginPage() {
       }
 
       if (data.user) {
+        setLoginStatus('idle');
         setSuccess('Logged in successfully. Redirecting...');
         setShowCelebration(true);
         setTimeout(() => {
@@ -160,7 +148,7 @@ export default function LoginPage() {
 
   return (
     <main
-      className="min-h-screen bg-white"
+      className="min-h-dvh bg-white"
       onMouseMove={(event) => {
         const rect = leftPanelRef.current?.getBoundingClientRect();
         if (!rect) {
@@ -172,12 +160,12 @@ export default function LoginPage() {
       }}
       onMouseLeave={() => setMouse((prev) => ({ ...prev, active: false }))}
     >
-      <div className="grid min-h-screen grid-cols-1 md:grid-cols-2">
+      <div className="grid min-h-dvh grid-cols-1 md:grid-cols-2">
         <section
           ref={leftPanelRef}
           className="relative overflow-hidden bg-gradient-to-br from-slate-600 via-slate-500 to-slate-400 p-8 text-white md:p-10"
         >
-          <div className="flex h-full flex-col justify-between">
+          <div className="flex h-full min-h-dvh flex-col">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-md bg-white/95 text-center text-sm font-bold leading-7 text-neutral-900">
                 PM
@@ -185,7 +173,7 @@ export default function LoginPage() {
               <span className="text-sm font-semibold tracking-wide">PM Love</span>
             </div>
 
-            <div className="flex flex-1 items-end justify-center px-2 pb-2 pt-8 md:pb-4">
+            <div className="flex flex-1 items-end justify-center px-2 pb-0 pt-6 md:pb-2">
               <svg
                 viewBox="0 0 100 100"
                 className="mx-auto h-[430px] w-full max-w-[560px] md:h-[560px]"
@@ -313,8 +301,6 @@ export default function LoginPage() {
                 </motion.g>
               </svg>
             </div>
-
-            <div />
           </div>
         </section>
 
