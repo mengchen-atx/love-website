@@ -134,7 +134,7 @@ export default function PhotosPage() {
             <p className="text-sm">还没有照片，上传你们的第一张吧 💕</p>
           </div>
         ) : (
-          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6">
             {photos.map((photo) => (
               <div key={photo.id}
                 className="group relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
@@ -142,8 +142,8 @@ export default function PhotosPage() {
                 <div className="aspect-square relative overflow-hidden">
                   <Image src={photo.url} alt={photo.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <div className="p-3">
-                  <h3 className="mb-1 text-sm font-semibold text-gray-800">{photo.title}</h3>
+                <div className="p-2.5">
+                  <h3 className="mb-1 text-xs font-semibold text-gray-800">{photo.title}</h3>
                   <p className="flex items-center gap-1 text-xs text-gray-500"><Calendar className="h-3.5 w-3.5" />{photo.date}</p>
                 </div>
               </div>

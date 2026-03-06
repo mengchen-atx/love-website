@@ -38,12 +38,12 @@ function ChinaMap({ features, visited, onToggle, tooltip, onTooltip }: {
   tooltip: string;
   onTooltip: (t: string) => void;
 }) {
-  const width = 800;
-  const height = 600;
+  const width = 700;
+  const height = 500;
 
   const projection = geoMercator()
     .center([104, 35])
-    .scale(580)
+    .scale(500)
     .translate([width / 2, height / 2]);
 
   const pathGen = geoPath().projection(projection);
@@ -302,13 +302,13 @@ export default function FootprintContent() {
         </div>
 
         {/* Map */}
-        <div className="overflow-hidden rounded-3xl bg-white shadow-lg">
+        <div className="mx-auto max-w-5xl overflow-hidden rounded-3xl bg-white p-1 shadow-lg">
           {/* 世界地图 */}
           {view === 'world' && (
             <ComposableMap
               projection="geoMercator"
               projectionConfig={{ center: [10, 20], scale: 147 }}
-              width={800} height={450}
+              width={700} height={390}
               style={{ width: '100%', height: 'auto' }}
             >
               <Geographies geography={WORLD_URL}>
@@ -339,7 +339,7 @@ export default function FootprintContent() {
 
           {/* 美国地图 */}
           {view === 'usa' && (
-            <ComposableMap projection="geoAlbersUsa" width={800} height={500}
+            <ComposableMap projection="geoAlbersUsa" width={700} height={430}
               style={{ width: '100%', height: 'auto' }}>
               <Geographies geography={US_URL}>
                 {({ geographies }: { geographies: any[] }) =>
