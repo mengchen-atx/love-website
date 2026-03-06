@@ -148,7 +148,7 @@ export default function LoginPage() {
 
   return (
     <main
-      className="min-h-dvh bg-white"
+      className="h-dvh overflow-hidden bg-white"
       onMouseMove={(event) => {
         const rect = leftPanelRef.current?.getBoundingClientRect();
         if (!rect) {
@@ -160,12 +160,12 @@ export default function LoginPage() {
       }}
       onMouseLeave={() => setMouse((prev) => ({ ...prev, active: false }))}
     >
-      <div className="grid min-h-dvh grid-cols-1 md:grid-cols-2">
+      <div className="grid h-full grid-cols-1 md:grid-cols-2">
         <section
           ref={leftPanelRef}
-          className="relative overflow-hidden bg-gradient-to-br from-slate-600 via-slate-500 to-slate-400 p-8 text-white md:p-10"
+          className="relative h-full overflow-hidden bg-gradient-to-br from-slate-600 via-slate-500 to-slate-400 p-6 text-white md:p-8"
         >
-          <div className="flex h-full min-h-dvh flex-col">
+          <div className="flex h-full min-h-0 flex-col">
             <div className="flex items-center gap-2">
               <div className="h-7 w-7 rounded-md bg-white/95 text-center text-sm font-bold leading-7 text-neutral-900">
                 PM
@@ -173,10 +173,10 @@ export default function LoginPage() {
               <span className="text-sm font-semibold tracking-wide">PM Love</span>
             </div>
 
-            <div className="flex flex-1 items-end justify-center px-2 pb-0 pt-6 md:pb-2">
+            <div className="flex min-h-0 flex-1 items-end justify-center px-1 pb-0 pt-4 md:pb-1 md:pt-3">
               <svg
                 viewBox="0 0 100 100"
-                className="mx-auto h-[430px] w-full max-w-[560px] md:h-[560px]"
+                className="mx-auto h-full max-h-full w-full max-w-[560px]"
                 aria-label="Animated geometric characters"
               >
                 <rect x="0" y="0" width="100" height="100" fill="transparent" />
@@ -360,19 +360,19 @@ export default function LoginPage() {
           </div>
         </section>
 
-        <section className="relative flex items-center justify-center overflow-hidden bg-white px-6 py-12 md:px-10">
+        <section className="relative flex h-full items-center justify-center overflow-hidden bg-white px-6 py-4 md:px-10 md:py-5">
           <div className="pointer-events-none absolute right-10 top-10 h-28 w-28 rounded-full bg-pink-200/50 blur-2xl" />
           <div className="pointer-events-none absolute bottom-14 left-8 h-32 w-32 rounded-full bg-violet-200/45 blur-2xl" />
 
           <div className="relative w-full max-w-md">
-            <div className="mb-6 rounded-3xl border border-pink-100 bg-gradient-to-r from-pink-50 via-rose-50 to-violet-50 p-4">
+            <div className="mb-4 rounded-3xl border border-pink-100 bg-gradient-to-r from-pink-50 via-rose-50 to-violet-50 p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="inline-flex items-center gap-1 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-pink-600">
                     <Sparkles className="h-3.5 w-3.5" />
                     Couple Space
                   </p>
-                  <h1 className="mt-3 text-3xl font-semibold tracking-tight text-gray-900">
+                  <h1 className="mt-2 text-[30px] font-semibold tracking-tight text-gray-900">
                     Welcome back, love
                   </h1>
                   <p className="mt-1 text-sm text-gray-600">
@@ -398,7 +398,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <div className="rounded-3xl border border-gray-100 bg-white/95 p-6 shadow-[0_24px_80px_-30px_rgba(244,114,182,0.45)] backdrop-blur">
+            <div className="rounded-3xl border border-gray-100 bg-white/95 p-5 shadow-[0_24px_80px_-30px_rgba(244,114,182,0.45)] backdrop-blur">
               <AnimatePresence>
                 {showCelebration ? (
                   <motion.div
@@ -452,7 +452,7 @@ export default function LoginPage() {
               </AnimatePresence>
               <p className="mb-5 text-sm text-gray-500">Please enter your details</p>
 
-              <form onSubmit={handleLogin} className="space-y-5">
+              <form onSubmit={handleLogin} className="space-y-4">
               <div>
                 <label className="mb-2 block text-sm font-medium text-gray-700">
                   Email
@@ -564,7 +564,7 @@ export default function LoginPage() {
               </form>
             </div>
 
-            <p className="mt-8 text-center text-sm text-gray-500">
+            <p className="mt-5 text-center text-sm text-gray-500">
               Don't have an account?{' '}
               <a href="#" className="font-medium text-pink-600 hover:underline">
                 Sign Up
