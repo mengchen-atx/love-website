@@ -241,48 +241,48 @@ export default function FootprintContent() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-      <div className="container mx-auto max-w-7xl px-4 py-6">
+      <div className="container mx-auto max-w-7xl px-4 py-5">
         {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> 返回首页
           </Link>
         </div>
 
         {/* Title */}
-        <div className="mb-6 text-center">
-          <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-orange-100">
-            <MapPin className="h-8 w-8 text-orange-600" />
+        <div className="mb-5 text-center">
+          <div className="mb-2 inline-flex h-14 w-14 items-center justify-center rounded-full bg-orange-100">
+            <MapPin className="h-7 w-7 text-orange-600" />
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-800 md:text-4xl">Love Footprint</h1>
-          <p className="text-base text-gray-600">我们一起走过的地方</p>
+          <h1 className="mb-1.5 text-2xl font-bold text-gray-800 md:text-3xl">Love Footprint</h1>
+          <p className="text-sm text-gray-600">我们一起走过的地方</p>
         </div>
 
         {/* Stats */}
-        <div className="mb-6 grid grid-cols-3 gap-3">
-          <div className="cursor-pointer rounded-2xl bg-white p-3 text-center shadow-md transition-all hover:shadow-lg" onClick={() => setView('world')}>
-            <p className="text-2xl font-bold text-orange-600">{totalCountries()}</p>
+        <div className="mb-5 grid grid-cols-3 gap-2.5">
+          <div className="cursor-pointer rounded-2xl bg-white p-2.5 text-center shadow-md transition-all hover:shadow-lg" onClick={() => setView('world')}>
+            <p className="text-xl font-bold text-orange-600">{totalCountries()}</p>
             <p className="text-xs text-gray-500">国家</p>
           </div>
-          <div className="cursor-pointer rounded-2xl bg-white p-3 text-center shadow-md transition-all hover:shadow-lg" onClick={() => setView('china')}>
-            <p className="text-2xl font-bold text-red-600">{countVisited('cn-')}</p>
+          <div className="cursor-pointer rounded-2xl bg-white p-2.5 text-center shadow-md transition-all hover:shadow-lg" onClick={() => setView('china')}>
+            <p className="text-xl font-bold text-red-600">{countVisited('cn-')}</p>
             <p className="text-xs text-gray-500">中国省份</p>
           </div>
-          <div className="cursor-pointer rounded-2xl bg-white p-3 text-center shadow-md transition-all hover:shadow-lg" onClick={() => setView('usa')}>
-            <p className="text-2xl font-bold text-blue-600">{countVisited('us-')}</p>
+          <div className="cursor-pointer rounded-2xl bg-white p-2.5 text-center shadow-md transition-all hover:shadow-lg" onClick={() => setView('usa')}>
+            <p className="text-xl font-bold text-blue-600">{countVisited('us-')}</p>
             <p className="text-xs text-gray-500">美国州</p>
           </div>
         </div>
 
         {/* View Tabs */}
-        <div className="mb-5 flex justify-center gap-2.5">
+        <div className="mb-4 flex justify-center gap-2">
           {([
             { key: 'world' as MapView, label: '世界地图' },
             { key: 'china' as MapView, label: '中国地图' },
             { key: 'usa' as MapView, label: '美国地图' },
           ]).map(({ key, label }) => (
             <button key={key} onClick={() => setView(key)}
-              className={`rounded-full px-5 py-2.5 text-sm font-medium transition-all ${
+              className={`rounded-full px-4 py-2 text-xs font-medium transition-all ${
                 view === key
                   ? 'scale-105 bg-gradient-to-r from-pink-500 to-orange-500 text-white shadow-lg'
                   : 'bg-white text-gray-600 shadow-md hover:bg-gray-50'
@@ -293,16 +293,16 @@ export default function FootprintContent() {
         </div>
 
         {/* Tooltip - 固定高度，不导致页面抖动 */}
-        <div className="mb-2 flex h-9 items-center justify-center">
+        <div className="mb-2 flex h-8 items-center justify-center">
           {tooltip && (
-            <span className="inline-block rounded-full bg-gray-800 px-3 py-1.5 text-xs text-white shadow-lg">
+            <span className="inline-block rounded-full bg-gray-800 px-3 py-1 text-[11px] text-white shadow-lg">
               {tooltip}
             </span>
           )}
         </div>
 
         {/* Map */}
-        <div className="overflow-hidden rounded-3xl bg-white shadow-xl">
+        <div className="overflow-hidden rounded-3xl bg-white shadow-lg">
           {/* 世界地图 */}
           {view === 'world' && (
             <ComposableMap
@@ -330,7 +330,7 @@ export default function FootprintContent() {
                 onTooltip={setTooltip}
               />
             ) : (
-              <div className="flex items-center justify-center py-24">
+              <div className="flex items-center justify-center py-20">
                 <Loader2 className="h-8 w-8 animate-spin text-pink-500" />
                 <span className="ml-3 text-sm text-gray-500">加载中国地图...</span>
               </div>
@@ -351,7 +351,7 @@ export default function FootprintContent() {
         </div>
 
         {/* Hint */}
-        <p className="mt-3 text-center text-xs text-gray-400 md:text-sm">
+        <p className="mt-2.5 text-center text-xs text-gray-400">
           {view === 'world'
             ? '点击国家标记去过 | 中国和美国（蓝色）点击查看省/州详情'
             : '点击标记为去过，再次点击取消 | '}
@@ -362,17 +362,17 @@ export default function FootprintContent() {
 
         {/* Visited List */}
         {(visited.size > 0 || hasAnyVisited('cn-') || hasAnyVisited('us-')) && (
-          <div className="mt-6 rounded-2xl bg-white p-5 shadow-md">
-            <h3 className="mb-3 flex items-center gap-2 text-base font-bold text-gray-800">
+          <div className="mt-5 rounded-2xl bg-white p-4 shadow-md">
+            <h3 className="mb-2.5 flex items-center gap-2 text-sm font-bold text-gray-800">
               <Locate className="h-4 w-4 text-pink-500" /> 已去过的地方
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {totalCountries() > 0 && (
                 <div>
                   <p className="mb-2 text-xs font-medium text-gray-500">国家</p>
                   <div className="flex flex-wrap gap-2">
                     {getCountryList().map(name => (
-                      <span key={name} className="rounded-full bg-orange-100 px-3 py-1 text-xs text-orange-700">{name}</span>
+                      <span key={name} className="rounded-full bg-orange-100 px-2.5 py-1 text-xs text-orange-700">{name}</span>
                     ))}
                   </div>
                 </div>
@@ -382,7 +382,7 @@ export default function FootprintContent() {
                   <p className="mb-2 text-xs font-medium text-gray-500">中国省份</p>
                   <div className="flex flex-wrap gap-2">
                     {getVisitedList('cn-').map(name => (
-                      <span key={name} className="rounded-full bg-red-100 px-3 py-1 text-xs text-red-700">{name}</span>
+                      <span key={name} className="rounded-full bg-red-100 px-2.5 py-1 text-xs text-red-700">{name}</span>
                     ))}
                   </div>
                 </div>
@@ -392,7 +392,7 @@ export default function FootprintContent() {
                   <p className="mb-2 text-xs font-medium text-gray-500">美国州</p>
                   <div className="flex flex-wrap gap-2">
                     {getVisitedList('us-').map(name => (
-                      <span key={name} className="rounded-full bg-blue-100 px-3 py-1 text-xs text-blue-700">{name}</span>
+                      <span key={name} className="rounded-full bg-blue-100 px-2.5 py-1 text-xs text-blue-700">{name}</span>
                     ))}
                   </div>
                 </div>
@@ -401,9 +401,9 @@ export default function FootprintContent() {
           </div>
         )}
 
-        <div className="mb-4 mt-6 flex items-center justify-center gap-2.5 text-gray-400">
+        <div className="mb-4 mt-5 flex items-center justify-center gap-2 text-gray-400">
           <Heart className="h-4 w-4 fill-gray-400" />
-          <p className="text-sm">世界那么大，我想和你一起看</p>
+          <p className="text-xs">世界那么大，我想和你一起看</p>
           <Heart className="h-4 w-4 fill-gray-400" />
         </div>
       </div>

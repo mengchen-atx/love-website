@@ -107,34 +107,34 @@ export default function PhotosPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-      <div className="container mx-auto max-w-7xl px-4 py-6">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="container mx-auto max-w-7xl px-4 py-5">
+        <div className="mb-5 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> 返回首页
           </Link>
           <button onClick={() => setShowUpload(true)}
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 px-5 py-2.5 text-sm text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-pink-500 to-purple-500 px-4 py-2 text-xs text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">
             <Upload className="h-4 w-4" /> 上传照片
           </button>
         </div>
 
-        <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-            <Heart className="h-8 w-8 fill-red-500 text-red-500" />
+        <div className="mb-6 text-center">
+          <div className="mb-2 inline-flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+            <Heart className="h-7 w-7 fill-red-500 text-red-500" />
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-800 md:text-4xl">Love Photo</h1>
-          <p className="text-base text-gray-600">恋爱相册 - 记录最美瞬间</p>
+          <h1 className="mb-1.5 text-2xl font-bold text-gray-800 md:text-3xl">Love Photo</h1>
+          <p className="text-sm text-gray-600">恋爱相册 - 记录最美瞬间</p>
         </div>
 
         {loading ? (
           <div className="text-center py-12 text-gray-500">加载中...</div>
         ) : photos.length === 0 ? (
-            <div className="py-16 text-center text-gray-400">
-            <ImageIcon className="mx-auto mb-4 h-16 w-16 opacity-30" />
-            <p className="text-base">还没有照片，上传你们的第一张吧 💕</p>
+            <div className="py-14 text-center text-gray-400">
+            <ImageIcon className="mx-auto mb-3 h-14 w-14 opacity-30" />
+            <p className="text-sm">还没有照片，上传你们的第一张吧 💕</p>
           </div>
         ) : (
-          <div className="mb-10 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {photos.map((photo) => (
               <div key={photo.id}
                 className="group relative cursor-pointer overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
@@ -142,7 +142,7 @@ export default function PhotosPage() {
                 <div className="aspect-square relative overflow-hidden">
                   <Image src={photo.url} alt={photo.title} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <div className="p-3.5">
+                <div className="p-3">
                   <h3 className="mb-1 text-sm font-semibold text-gray-800">{photo.title}</h3>
                   <p className="flex items-center gap-1 text-xs text-gray-500"><Calendar className="h-3.5 w-3.5" />{photo.date}</p>
                 </div>
@@ -163,12 +163,12 @@ export default function PhotosPage() {
                   <Image src={selectedPhoto.url} alt={selectedPhoto.title} fill sizes="(max-width: 768px) 100vw, 800px" className="object-contain" />
                 </div>
               </div>
-              <div className="p-6">
-                <h2 className="mb-2 text-2xl font-bold text-gray-800">{selectedPhoto.title}</h2>
+              <div className="p-5">
+                <h2 className="mb-1.5 text-xl font-bold text-gray-800">{selectedPhoto.title}</h2>
                 <p className="mb-3 flex items-center gap-2 text-sm text-gray-500"><Calendar className="h-4 w-4" />{selectedPhoto.date}</p>
-                {selectedPhoto.description && <p className="mb-5 text-sm text-gray-600">{selectedPhoto.description}</p>}
+                {selectedPhoto.description && <p className="mb-4 text-xs text-gray-600">{selectedPhoto.description}</p>}
                 <button onClick={() => handleDelete(selectedPhoto.id, selectedPhoto.url)}
-                  className="rounded-full bg-red-500 px-5 py-2 text-sm text-white transition-colors hover:bg-red-600">删除照片</button>
+                  className="rounded-full bg-red-500 px-4 py-1.5 text-xs text-white transition-colors hover:bg-red-600">删除照片</button>
               </div>
             </div>
           </div>
@@ -177,9 +177,9 @@ export default function PhotosPage() {
         {/* 上传对话框 */}
         {showUpload && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={resetUploadForm}>
-            <div className="w-full max-w-2xl rounded-3xl bg-white p-6" onClick={(e) => e.stopPropagation()}>
+            <div className="w-full max-w-2xl rounded-3xl bg-white p-5" onClick={(e) => e.stopPropagation()}>
               <div className="mb-5 flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-800">上传照片</h2>
+                <h2 className="text-lg font-bold text-gray-800">上传照片</h2>
                 <button onClick={resetUploadForm} className="text-gray-400 hover:text-gray-600"><X className="h-5 w-5" /></button>
               </div>
 
@@ -189,7 +189,7 @@ export default function PhotosPage() {
 
               {/* 拖拽/点击区域 */}
               {previewUrl ? (
-                <div className="relative mb-6">
+                <div className="relative mb-5">
                   <img src={previewUrl} alt="预览" className="max-h-64 w-full rounded-2xl border border-gray-200 object-contain" />
                   <button onClick={() => { setSelectedFile(null); setPreviewUrl(null); }}
                     className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600">
@@ -199,26 +199,26 @@ export default function PhotosPage() {
               ) : (
                 <div onClick={() => fileInputRef.current?.click()}
                   onDragOver={(e) => e.preventDefault()} onDrop={handleDrop}
-                  className="mb-5 cursor-pointer rounded-2xl border-2 border-dashed border-gray-300 p-10 text-center transition-colors hover:border-pink-400">
-                  <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                  <p className="mb-2 text-sm text-gray-600">点击选择照片 或 拖拽照片到这里</p>
+                  className="mb-5 cursor-pointer rounded-2xl border-2 border-dashed border-gray-300 p-8 text-center transition-colors hover:border-pink-400">
+                  <Upload className="mx-auto mb-3 h-10 w-10 text-gray-400" />
+                  <p className="mb-1.5 text-xs text-gray-600">点击选择照片 或 拖拽照片到这里</p>
                   <p className="text-xs text-gray-400">支持 JPG, PNG, WEBP 格式</p>
                 </div>
               )}
 
               <div className="space-y-4">
                 <input type="text" placeholder="照片标题" value={uploadForm.title} onChange={(e) => setUploadForm({...uploadForm, title: e.target.value})}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-500" />
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-500" />
                 <input type="date" value={uploadForm.date} onChange={(e) => setUploadForm({...uploadForm, date: e.target.value})}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-500" />
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-500" />
                 <textarea placeholder="照片描述（可选）" rows={3} value={uploadForm.description} onChange={(e) => setUploadForm({...uploadForm, description: e.target.value})}
-                  className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-500" />
+                  className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-pink-500" />
               </div>
 
               <div className="mt-5 flex gap-3">
-                <button onClick={resetUploadForm} className="flex-1 rounded-xl border border-gray-300 px-5 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50">取消</button>
+                <button onClick={resetUploadForm} className="flex-1 rounded-xl border border-gray-300 px-4 py-2 text-xs text-gray-700 transition-colors hover:bg-gray-50">取消</button>
                 <button onClick={handleUpload} disabled={!selectedFile || !uploadForm.title || uploading}
-                  className="flex-1 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 px-5 py-2.5 text-sm text-white transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
+                  className="flex-1 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 px-4 py-2 text-xs text-white transition-all hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50">
                   {uploading ? '上传中...' : '上传'}
                 </button>
               </div>

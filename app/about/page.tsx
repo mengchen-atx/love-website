@@ -68,8 +68,8 @@ export default function AboutPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
-      <div className="container mx-auto max-w-5xl px-4 py-6">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="container mx-auto max-w-5xl px-4 py-5">
+        <div className="mb-5 flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-gray-900">
             <ArrowLeft className="h-4 w-4" /> 返回首页
           </Link>
@@ -80,27 +80,27 @@ export default function AboutPage() {
               </span>
             )}
             <button onClick={() => setShowAddForm(true)}
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2.5 text-sm text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-xs text-white transition-all duration-300 hover:scale-105 hover:shadow-lg">
               <Plus className="h-4 w-4" /> 添加时间点
             </button>
           </div>
         </div>
 
-        <div className="mb-10 text-center">
-          <div className="mb-3 inline-flex h-16 w-16 items-center justify-center rounded-full bg-purple-100">
-            <Users className="h-8 w-8 text-purple-600" />
+        <div className="mb-7 text-center">
+          <div className="mb-2 inline-flex h-14 w-14 items-center justify-center rounded-full bg-purple-100">
+            <Users className="h-7 w-7 text-purple-600" />
           </div>
-          <h1 className="mb-2 text-3xl font-bold text-gray-800 md:text-4xl">关于我们</h1>
-          <p className="text-base text-gray-600">我们的经历</p>
+          <h1 className="mb-1.5 text-2xl font-bold text-gray-800 md:text-3xl">关于我们</h1>
+          <p className="text-sm text-gray-600">我们的经历</p>
         </div>
 
         {/* 简介卡片 */}
-        <div className="mb-12 rounded-3xl bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-6 shadow-2xl md:p-8">
+        <div className="mb-10 rounded-3xl bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100 p-5 shadow-2xl md:p-6">
           <div className="max-w-3xl mx-auto text-center">
-            <Heart className="mx-auto mb-5 h-12 w-12 animate-pulse-slow fill-red-500 text-red-500" />
-            <h2 className="mb-4 text-2xl font-bold text-gray-800">Mao & Pi 的爱情故事</h2>
-            <p className="mb-3 text-base leading-relaxed text-gray-700">两个人，从陌生到熟悉，从朋友到恋人。</p>
-            <p className="text-base leading-relaxed text-gray-700">
+            <Heart className="mx-auto mb-4 h-10 w-10 animate-pulse-slow fill-red-500 text-red-500" />
+            <h2 className="mb-3 text-xl font-bold text-gray-800">Mao & Pi 的爱情故事</h2>
+            <p className="mb-2 text-sm leading-relaxed text-gray-700">两个人，从陌生到熟悉，从朋友到恋人。</p>
+            <p className="text-sm leading-relaxed text-gray-700">
               我们用这个网站记录彼此的点点滴滴，见证我们的爱情成长。
               每一张照片、每一段文字、每一个约定，都是我们爱情的印记。
             </p>
@@ -108,8 +108,8 @@ export default function AboutPage() {
         </div>
 
         {/* 时间轴 */}
-        <div className="mb-12">
-          <h2 className="mb-8 text-center text-2xl font-bold text-gray-800">我们的重要时刻</h2>
+        <div className="mb-10">
+          <h2 className="mb-6 text-center text-xl font-bold text-gray-800">我们的重要时刻</h2>
 
           {loading ? (
             <div className="text-center py-12 text-gray-500">加载中...</div>
@@ -119,18 +119,18 @@ export default function AboutPage() {
             <div className="relative">
               <div className="absolute left-1/2 transform -translate-x-1/2 top-0 bottom-0 w-1 bg-gradient-to-b from-pink-300 via-purple-300 to-blue-300 hidden md:block"></div>
 
-              <div className="space-y-10">
+              <div className="space-y-8">
                 {milestones.map((milestone, index) => {
                   const isLeft = index % 2 === 0; // 左侧显示（内容右对齐靠近轴）
                   return (
                   <div key={milestone.id}
-                    className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-col gap-6`}>
+                    className={`relative flex items-center ${isLeft ? 'md:flex-row' : 'md:flex-row-reverse'} flex-col gap-5`}>
                     
                     {/* 内容区域 */}
                     <div className={`flex-1 ${isLeft ? 'md:flex md:justify-end' : 'md:flex md:justify-start'} flex justify-center`}>
                       {editingId === milestone.id ? (
                         /* 编辑模式 */
-                        <div className="w-full max-w-sm space-y-3 rounded-2xl bg-white p-5 shadow-lg">
+                        <div className="w-full max-w-sm space-y-2.5 rounded-2xl bg-white p-4 shadow-lg">
                           <input type="date" value={editForm.date} onChange={(e) => setEditForm({...editForm, date: e.target.value})}
                             className="w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                           <input type="text" value={editForm.title} onChange={(e) => setEditForm({...editForm, title: e.target.value})} placeholder="标题"
@@ -145,9 +145,9 @@ export default function AboutPage() {
                       ) : (
                         /* 显示模式 */
                         <div className={`${isLeft ? 'md:text-right' : 'md:text-left'} text-center group relative`}>
-                          <p className="mb-1.5 text-xs text-gray-500">{milestone.date}</p>
-                          <h3 className="mb-1.5 text-xl font-bold text-gray-800">{milestone.title}</h3>
-                          <p className="text-sm text-gray-600">{milestone.description}</p>
+                          <p className="mb-1 text-xs text-gray-500">{milestone.date}</p>
+                          <h3 className="mb-1 text-lg font-bold text-gray-800">{milestone.title}</h3>
+                          <p className="text-xs text-gray-600">{milestone.description}</p>
                           <p className="text-xs text-gray-400 mt-2">by {milestone.author}</p>
                           {/* 操作按钮 */}
                           <div className={`opacity-0 group-hover:opacity-100 transition-all flex gap-2 ${isLeft ? 'md:justify-end' : 'md:justify-start'} justify-center mt-3`}>
@@ -164,8 +164,8 @@ export default function AboutPage() {
 
                     {/* 中间图标 */}
                     <div className="relative z-10 flex-shrink-0">
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-500 shadow-lg">
-                        <Heart className="h-7 w-7 text-white" />
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 to-purple-500 shadow-lg">
+                        <Heart className="h-6 w-6 text-white" />
                       </div>
                     </div>
 
@@ -180,47 +180,47 @@ export default function AboutPage() {
         </div>
 
         {/* 底部卡片 */}
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="rounded-2xl bg-white p-6 shadow-lg">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
-              <Heart className="h-5 w-5 text-pink-600" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl bg-white p-5 shadow-lg">
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-pink-100">
+              <Heart className="h-4.5 w-4.5 text-pink-600" />
             </div>
-            <h3 className="mb-1.5 text-lg font-bold text-gray-800">Mao</h3>
-            <p className="text-sm text-gray-600">喜欢浪漫，喜欢记录生活，喜欢和你在一起的每一天。</p>
+            <h3 className="mb-1 text-base font-bold text-gray-800">Mao</h3>
+            <p className="text-xs text-gray-600">喜欢浪漫，喜欢记录生活，喜欢和你在一起的每一天。</p>
           </div>
-          <div className="rounded-2xl bg-white p-6 shadow-lg">
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
-              <Heart className="h-5 w-5 text-purple-600" />
+          <div className="rounded-2xl bg-white p-5 shadow-lg">
+            <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-full bg-purple-100">
+              <Heart className="h-4.5 w-4.5 text-purple-600" />
             </div>
-            <h3 className="mb-1.5 text-lg font-bold text-gray-800">Pi</h3>
-            <p className="text-sm text-gray-600">喜欢花，喜欢你的陪伴，珍惜我们在一起的每个瞬间。</p>
+            <h3 className="mb-1 text-base font-bold text-gray-800">Pi</h3>
+            <p className="text-xs text-gray-600">喜欢花，喜欢你的陪伴，珍惜我们在一起的每个瞬间。</p>
           </div>
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-10 text-center">
           <div className="flex items-center justify-center gap-4 text-gray-400">
-            <Heart className="w-6 h-6 fill-gray-400" />
+            <Heart className="h-5 w-5 fill-gray-400" />
             <p className="text-sm">愿我们的爱情，如同这个网站，永远美好</p>
-            <Heart className="w-6 h-6 fill-gray-400" />
+            <Heart className="h-5 w-5 fill-gray-400" />
           </div>
         </div>
 
         {/* 添加时间点弹窗 */}
         {showAddForm && (
           <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAddForm(false)}>
-            <div className="w-full max-w-lg rounded-3xl bg-white p-6" onClick={(e) => e.stopPropagation()}>
-              <h2 className="mb-5 text-xl font-bold text-gray-800">添加新的时间点</h2>
+            <div className="w-full max-w-lg rounded-3xl bg-white p-5" onClick={(e) => e.stopPropagation()}>
+              <h2 className="mb-4 text-lg font-bold text-gray-800">添加新的时间点</h2>
               <div className="space-y-4">
                 <input type="date" value={form.date} onChange={(e) => setForm({...form, date: e.target.value})}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                 <input type="text" placeholder="标题 - 比如：第一次约会" value={form.title} onChange={(e) => setForm({...form, title: e.target.value})}
-                  className="w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  className="w-full rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                 <textarea placeholder="写一些关于这个时刻的回忆..." value={form.description} onChange={(e) => setForm({...form, description: e.target.value})}
-                  rows={4} className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+                  rows={4} className="w-full resize-none rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-purple-500" />
               </div>
               <div className="mt-5 flex gap-3">
-                <button onClick={() => setShowAddForm(false)} className="flex-1 rounded-xl border border-gray-300 px-5 py-2.5 text-sm text-gray-700 transition-colors hover:bg-gray-50">取消</button>
-                <button onClick={handleAdd} className="flex-1 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-5 py-2.5 text-sm text-white transition-all hover:shadow-lg">添加</button>
+                <button onClick={() => setShowAddForm(false)} className="flex-1 rounded-xl border border-gray-300 px-4 py-2 text-xs text-gray-700 transition-colors hover:bg-gray-50">取消</button>
+                <button onClick={handleAdd} className="flex-1 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-xs text-white transition-all hover:shadow-lg">添加</button>
               </div>
             </div>
           </div>
