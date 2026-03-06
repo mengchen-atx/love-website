@@ -1,109 +1,68 @@
-# 💕 Love Website - 情侣纪念网站
+# PM Love - 情侣纪念网站
 
-一个专为情侣设计的私密相册和日记网站，记录你们一起走过的每一个美好瞬间。
+一个为两个人设计的私密恋爱记录网站，记录日常、留言、照片和足迹。
 
-## ✨ 功能特性
+## 功能概览
 
-- 📸 **Love Photo** - 恋爱相册，记录最美瞬间
-- 📝 **点点滴滴** - 生活记录，记住每个重要时刻
-- 💬 **留言板** - 互相留言，写下爱的祝福
-- 📋 **Love List** - 恋爱清单，记录你们的约定
-- 👫 **关于我们** - 你们的故事
-- ⏱️ **倒计时** - 实时显示在一起的时间
+- 登录页：双栏布局 + 左侧互动小人动画（眼睛/嘴巴/身体跟随鼠标）
+- 登录成功：1.5 秒庆祝动画后进入主界面
+- 首页：倒计时 + 功能入口卡片
+- 点点滴滴：时间线式生活记录
+- 留言板：实时聊天式留言
+- Love List：恋爱约定清单
+- Love Photo：相册上传与查看
+- Love Footprint：世界/中国/美国地图足迹记录
+- 关于我们：恋爱故事与重要时刻
+- 顶部退出按钮：退出后回到登录页
 
-## 🚀 快速开始
+## 登录界面预览
 
-### 1. 安装依赖
+![登录界面预览](./login-ui.png)
+
+## 本地启动
 
 ```bash
 npm install
+npm run dev
 ```
 
-### 2. 配置环境变量
+默认访问：
 
-复制 `.env.example` 为 `.env.local` 并填入你的配置：
+- 首页：`http://localhost:3000/`
+- 登录页：`http://localhost:3000/login`
 
-```bash
-cp .env.example .env.local
-```
+如果 3000 被占用，Next.js 会自动换端口（如 3001）。
 
-编辑 `.env.local`：
+## 环境变量
+
+创建 `.env.local`：
 
 ```env
-# 在一起的开始日期（格式：YYYY-MM-DD）
 NEXT_PUBLIC_START_DATE=2021-06-01
-
-# 两人的名字
-NEXT_PUBLIC_PARTNER1_NAME=Ki
-NEXT_PUBLIC_PARTNER2_NAME=Yi
-
-# Supabase 配置（后续添加）
+NEXT_PUBLIC_PARTNER1_NAME=Mao
+NEXT_PUBLIC_PARTNER2_NAME=Pi
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
-### 3. 添加头像
+## 技术栈
 
-将两人的照片放在 `public/images/` 文件夹中：
-- `partner1.jpg` - 第一个人的头像
-- `partner2.jpg` - 第二个人的头像
+- Next.js 15 (App Router)
+- React 18 + TypeScript
+- Tailwind CSS
+- Framer Motion
+- Lucide React
+- Supabase
 
-### 4. 启动开发服务器
+## 部署
 
-```bash
-npm run dev
-```
+推荐 Vercel：
 
-打开浏览器访问 [http://localhost:3000](http://localhost:3000)
-
-## 📦 技术栈
-
-- **框架**: Next.js 15 (App Router)
-- **语言**: TypeScript
-- **样式**: TailwindCSS
-- **图标**: Lucide React
-- **数据库**: Supabase (即将集成)
-- **部署**: Vercel
-
-## 🎨 界面预览
-
-首页包含：
-- 双人头像展示
-- 实时倒计时
-- 功能导航卡片
-- 响应式设计（支持手机/平板/电脑）
-
-## 📱 部署到 Vercel（免费）
-
-1. 将代码推送到 GitHub
-2. 访问 [vercel.com](https://vercel.com)
-3. 导入你的 GitHub 仓库
-4. 配置环境变量
-5. 点击部署
-
-## 🔐 后续功能开发
-
-- [ ] 用户登录认证（只允许两个人登录）
-- [ ] 照片上传和管理
-- [ ] 日记/日志功能
-- [ ] 留言板
-- [ ] 时间轴展示
-- [ ] 评论功能
-- [ ] 照片标签和分类
-- [ ] 搜索功能
-
-## 💝 使用建议
-
-这是一个私密的两人空间，建议：
-1. 不要公开分享网站链接
-2. 使用强密码保护账户
-3. 定期备份照片
-4. 享受记录生活的乐趣
-
-## 📄 License
-
-MIT License - 自由使用和修改
+1. 推送代码到 GitHub
+2. 在 Vercel 导入仓库
+3. 配置 `.env.local` 对应环境变量
+4. 点击部署
 
 ---
 
-用 ❤️ 打造的情侣专属空间
+PM Love - 记录你们每一个心动瞬间
