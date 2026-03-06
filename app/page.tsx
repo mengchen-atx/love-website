@@ -22,7 +22,7 @@ export default function Home() {
   const partner2Name = process.env.NEXT_PUBLIC_PARTNER2_NAME || 'Yi';
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
+    <main className="min-h-screen overflow-x-hidden bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
       {/* Header */}
       <Header />
       
@@ -30,9 +30,9 @@ export default function Home() {
       <div className="grid-background min-h-screen">
         
         {/* 顶部头像区域 - 占据屏幕高度的 4/5 */}
-        <section className="relative min-h-[80vh] flex items-center justify-center pt-24 pb-20">
+        <section className="relative flex min-h-[75vh] items-center justify-center overflow-hidden pt-20 pb-14">
           <div className="container mx-auto px-4 w-full max-w-7xl">
-            <div className="flex items-center justify-center gap-12 md:gap-24 lg:gap-32 scale-110 md:scale-125">
+            <div className="flex items-center justify-center gap-7 md:gap-14 lg:gap-20 scale-95 md:scale-100">
               {/* Partner 1 头像 */}
               <Avatar
                 name={partner1Name}
@@ -61,10 +61,10 @@ export default function Home() {
         </section>
 
         {/* 倒计时区域 */}
-        <section className="py-12">
+        <section className="py-10">
           <div className="container mx-auto px-4">
-            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-12 max-w-4xl mx-auto">
-              <h2 className="text-2xl md:text-3xl text-center mb-8 text-love-pink font-medium">
+            <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl p-8 md:p-10 max-w-4xl mx-auto">
+              <h2 className="text-xl md:text-2xl text-center mb-6 text-love-pink font-medium">
                 这是我们一起走过的
               </h2>
               <Countdown startDate={startDate} />
@@ -73,7 +73,7 @@ export default function Home() {
         </section>
 
         {/* 功能卡片区域 */}
-        <section className="py-12">
+        <section className="py-10">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto mb-12">
               <FeatureCard
@@ -104,8 +104,8 @@ export default function Home() {
               <LoveCard
                 icon={
                   <div className="bg-red-100 p-6 rounded-2xl">
-                    <Calendar className="w-16 h-16 text-red-500" />
-                    <Heart className="w-8 h-8 text-red-500 fill-red-500 absolute -mt-2 ml-12" />
+                    <Calendar className="h-14 w-14 text-red-500" />
+                    <Heart className="absolute -mt-2 ml-10 h-7 w-7 fill-red-500 text-red-500" />
                   </div>
                 }
                 title="Love Photo"
@@ -116,8 +116,8 @@ export default function Home() {
                 icon={
                   <div className="bg-pink-100 p-6 rounded-2xl">
                     <div className="relative">
-                      <Heart className="w-12 h-12 text-pink-500 fill-pink-500" />
-                      <List className="w-10 h-10 text-pink-500 absolute top-8 left-8" />
+                      <Heart className="h-11 w-11 fill-pink-500 text-pink-500" />
+                      <List className="absolute left-7 top-7 h-9 w-9 text-pink-500" />
                     </div>
                   </div>
                 }
@@ -128,7 +128,7 @@ export default function Home() {
               <LoveCard
                 icon={
                   <div className="bg-orange-100 p-6 rounded-2xl">
-                    <MapPin className="w-16 h-16 text-orange-500" />
+                    <MapPin className="h-14 w-14 text-orange-500" />
                   </div>
                 }
                 title="Love Footprint"
@@ -140,7 +140,7 @@ export default function Home() {
         </section>
 
         {/* 底部装饰 */}
-        <section className="py-16">
+        <section className="py-12">
           <div className="container mx-auto px-4 text-center">
             <div className="flex items-center justify-center gap-4 text-gray-400">
               <Heart className="w-6 h-6 fill-gray-400" />
