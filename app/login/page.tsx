@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 
-type LoginStatus = 'idle' | 'typing' | 'error';
+type LoginStatus = 'idle' | 'typing' | 'error' | 'success';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -128,12 +128,12 @@ export default function LoginPage() {
       }
 
       if (data.user) {
-        setLoginStatus('idle');
+        setLoginStatus('success');
         setSuccess('Logged in successfully. Redirecting...');
         setShowCelebration(true);
         setTimeout(() => {
           router.push('/');
-        }, 1800);
+        }, 1000);
       }
     } catch (authFailed) {
       const message =
@@ -184,9 +184,14 @@ export default function LoginPage() {
                 <motion.g
                   animate={{
                     ...getBodyOffset(52, 28, 2.6, 5),
+                    ...(loginStatus === 'success' ? { y: [0, -2.8, 0], rotate: [0, -5, 4, 0] } : {}),
                     ...(loginStatus === 'error' ? { rotate: -4 } : {}),
                   }}
-                  transition={{ type: 'spring', stiffness: 180, damping: 14 }}
+                  transition={
+                    loginStatus === 'success'
+                      ? { duration: 0.55, repeat: Infinity, repeatType: 'reverse' }
+                      : { type: 'spring', stiffness: 180, damping: 14 }
+                  }
                   style={{ transformOrigin: '52px 38px' }}
                 >
                   <polygon points="46,14 72,14 64,56 38,56" fill="#6D4BFF" />
@@ -211,9 +216,14 @@ export default function LoginPage() {
                 <motion.g
                   animate={{
                     ...getBodyOffset(24, 72, 3.2, 4),
+                    ...(loginStatus === 'success' ? { y: [0, -2.1, 0], rotate: [0, -2, 3, 0] } : {}),
                     ...(loginStatus === 'error' ? { x: -1.2 } : {}),
                   }}
-                  transition={{ type: 'spring', stiffness: 170, damping: 15 }}
+                  transition={
+                    loginStatus === 'success'
+                      ? { duration: 0.5, repeat: Infinity, repeatType: 'reverse' }
+                      : { type: 'spring', stiffness: 170, damping: 15 }
+                  }
                 >
                   <path d="M3,100 L3,78 A21,21 0 0,1 45,78 L45,100 Z" fill="#F89968" />
                   <motion.circle
@@ -235,12 +245,15 @@ export default function LoginPage() {
                 <motion.g
                   animate={{
                     ...getBodyOffset(54, 74, 2.9, 4.6),
+                    ...(loginStatus === 'success' ? { y: [0, -3.2, 0], rotate: [0, 2, -2, 0] } : {}),
                     ...(loginStatus === 'error' ? { y: [0, -1.8, 0] } : {}),
                   }}
                   transition={
-                    loginStatus === 'error'
-                      ? { duration: 0.55, repeat: Infinity, repeatType: 'reverse' }
-                      : { type: 'spring', stiffness: 180, damping: 15 }
+                    loginStatus === 'success'
+                      ? { duration: 0.5, repeat: Infinity, repeatType: 'reverse' }
+                      : loginStatus === 'error'
+                        ? { duration: 0.55, repeat: Infinity, repeatType: 'reverse' }
+                        : { type: 'spring', stiffness: 180, damping: 15 }
                   }
                 >
                   <rect x="46" y="34" width="24" height="66" rx="2.5" fill="#4B5563" />
@@ -265,9 +278,14 @@ export default function LoginPage() {
                 <motion.g
                   animate={{
                     ...getBodyOffset(79, 78, 3.4, 4.8),
+                    ...(loginStatus === 'success' ? { y: [0, -2.5, 0], rotate: [0, 3.2, -3.2, 0] } : {}),
                     ...(loginStatus === 'error' ? { rotate: 2.2 } : {}),
                   }}
-                  transition={{ type: 'spring', stiffness: 180, damping: 15 }}
+                  transition={
+                    loginStatus === 'success'
+                      ? { duration: 0.48, repeat: Infinity, repeatType: 'reverse' }
+                      : { type: 'spring', stiffness: 180, damping: 15 }
+                  }
                   style={{ transformOrigin: '79px 84px' }}
                 >
                   <path d="M60,100 L60,68 A19,19 0 0,1 98,68 L98,100 Z" fill="#E5D755" />
@@ -289,7 +307,9 @@ export default function LoginPage() {
                     d={
                       loginStatus === 'error'
                         ? 'M68 75 C71 79, 75 71, 78 75 C81 79, 85 71, 88 75'
-                        : 'M68 75 L88 75'
+                        : loginStatus === 'success'
+                          ? 'M68 75 C72 82, 84 82, 88 75'
+                          : 'M68 75 L88 75'
                     }
                     animate={getMouthOffset(78, 75, 1.3, 6)}
                     stroke="#1F2937"
@@ -299,6 +319,42 @@ export default function LoginPage() {
                     transition={{ type: 'spring', stiffness: 230, damping: 18 }}
                   />
                 </motion.g>
+
+                <AnimatePresence>
+                  {loginStatus === 'success' ? (
+                    <motion.g
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <motion.circle
+                        cx="36"
+                        cy="18"
+                        r="1.3"
+                        fill="#F9A8D4"
+                        animate={{ y: [-1, -6, -12], opacity: [0.95, 0.8, 0] }}
+                        transition={{ duration: 0.9, repeat: Infinity, ease: 'easeOut' }}
+                      />
+                      <motion.circle
+                        cx="44"
+                        cy="16"
+                        r="1"
+                        fill="#A78BFA"
+                        animate={{ y: [0, -4, -10], opacity: [0.95, 0.8, 0] }}
+                        transition={{ duration: 0.85, repeat: Infinity, delay: 0.2, ease: 'easeOut' }}
+                      />
+                      <motion.circle
+                        cx="84"
+                        cy="20"
+                        r="1.2"
+                        fill="#FDE047"
+                        animate={{ y: [0, -4, -10], opacity: [0.95, 0.8, 0] }}
+                        transition={{ duration: 0.8, repeat: Infinity, delay: 0.1, ease: 'easeOut' }}
+                      />
+                    </motion.g>
+                  ) : null}
+                </AnimatePresence>
               </svg>
             </div>
           </div>

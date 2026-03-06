@@ -14,6 +14,20 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
+    let loginRedirectTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const redirectFromLoginWithDelay = () => {
+      if (window.location.pathname !== '/login') {
+        return;
+      }
+      if (loginRedirectTimer) {
+        return;
+      }
+      loginRedirectTimer = setTimeout(() => {
+        router.push('/');
+      }, 1000);
+    };
+
     // 如果 Supabase 未配置，直接放行
     if (!supabase) {
       setAuthenticated(true);
@@ -27,10 +41,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       if (session) {
         setAuthenticated(true);
         setUserEmail(session.user?.email ?? null);
-        // 如果在登录页但已登录，跳转到首页
-        if (window.location.pathname === '/login') {
-          router.push('/');
-        }
+        // 在登录页登录成功后，留1秒给庆祝动画播放
+        redirectFromLoginWithDelay();
       } else {
         setAuthenticated(false);
         setUserEmail(null);
@@ -50,9 +62,8 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
         if (session) {
           setAuthenticated(true);
           setUserEmail(session.user?.email ?? null);
-          if (window.location.pathname === '/login') {
-            router.push('/');
-          }
+          // 在登录页登录成功后，留1秒给庆祝动画播放
+          redirectFromLoginWithDelay();
         } else {
           setAuthenticated(false);
           setUserEmail(null);
@@ -63,7 +74,12 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      if (loginRedirectTimer) {
+        clearTimeout(loginRedirectTimer);
+      }
+      subscription.unsubscribe();
+    };
   }, []);
 
   // 加载中显示 loading
